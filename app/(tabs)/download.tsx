@@ -36,7 +36,7 @@ export default function Download() {
 
   const search = async () => {
     const res = await fetch(
-      `http://192.168.100.4:3000/search?q=${encodeURIComponent(query)}`,
+      `http://192.168.100.6:3000/search?q=${encodeURIComponent(query)}`,
     );
     const data = await res.json();
     setResults(data);
@@ -57,7 +57,7 @@ export default function Download() {
     const thumbnailUri = SONG_DIR + item.id + '.jpg';
 
     await FileSystem.downloadAsync(
-      `http://192.168.100.4:3000/download?url=${encodeURIComponent(item.webpage_url)}`,
+      `http://192.168.100.6:3000/download?url=${encodeURIComponent(item.webpage_url)}`,
       fileUri,
     );
     await FileSystem.downloadAsync(item.thumbnail, thumbnailUri);
