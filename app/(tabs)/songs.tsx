@@ -12,7 +12,7 @@ import {
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system/legacy';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ExponentFileSystem from 'expo-file-system/src/legacy/ExponentFileSystem';
+import { usePlayer } from '../context/player';
 
 type Song = {
   id: string;
@@ -28,6 +28,7 @@ export default function Songs() {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const { play } = usePlayer();
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -116,9 +117,7 @@ export default function Songs() {
           ListEmptyComponent={<Text>No Songs Downloaded</Text>}
           renderItem={({ item }) => (
             <Pressable
-              onPress={() =>
-                selectMode ? toggleSelect(item.id) : playSong(item.fileUri)
-              }
+              onPress={() => (selectMode ? toggleSelect(item.id) : play(item))}
               className="flex-row gap-3 my-2 bg-white p-2 rounded"
             >
               <Image
