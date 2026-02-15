@@ -9,31 +9,42 @@ export default function MiniPlayer() {
     currentSong,
     isPlaying,
     togglePauseResume,
-    mode,
-    setMode,
+    cyclePlayMode,
+    playPrev,
+    playNext,
+    playerMode,
+    setPlayerMode,
     position,
     duration,
+    playMode,
   } = usePlayer();
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (mode === 'full') {
-        setMode('mini');
+      if (playerMode === 'full') {
+        setPlayerMode('mini');
         return true;
       }
       return false;
     });
     return () => sub.remove();
-  }, [mode]);
+  }, [playerMode]);
+
+  const formatTime = (ms: number) => {
+    const totalSec = Math.floor(ms / 1000);
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    return `${min}:${sec.toString().padStart(2, '0')}`;
+  };
 
   if (!currentSong) {
     return null;
   }
 
-  if (mode == 'mini') {
+  if (playerMode == 'mini') {
     return (
       <Pressable
-        onPress={() => setMode('full')}
+        onPress={() => setPlayerMode('full')}
         className="absolute bottom-16 left-2 right-2 bg-zinc-900 p-3 rounded-xl flex-row items-center gap-3"
       >
         <Image
@@ -44,16 +55,26 @@ export default function MiniPlayer() {
           <Text className="text-white">{currentSong.track}</Text>
           <Text className="text-gray-400 text-xs">{currentSong.artist}</Text>
         </View>
-        <Pressable onPress={togglePauseResume}>
-          <Text className="text-white">{isPlaying ? 'Pause' : 'Resume'}</Text>
-        </Pressable>
+        <View className="flex-row gap-3">
+          <Pressable onPress={playPrev}>
+            <Text className="text-white">⏮</Text>
+          </Pressable>
+
+          <Pressable onPress={togglePauseResume}>
+            <Text className="text-white">{isPlaying ? '⏸' : '▶'}</Text>
+          </Pressable>
+
+          <Pressable onPress={playNext}>
+            <Text className="text-white">⏭</Text>
+          </Pressable>
+        </View>
       </Pressable>
     );
   } else {
     return (
       <View className="absolute inset-0 bg-black p-6 justify-center items-center">
         <Pressable
-          onPress={() => setMode('mini')}
+          onPress={() => setPlayerMode('mini')}
           className="absolute top-12 left-6"
         >
           <Text className="text-white text-lg">↓</Text>
@@ -79,12 +100,31 @@ export default function MiniPlayer() {
           }}
         />
 
-        <Pressable
-          onPress={togglePauseResume}
-          className="bg-white px-6 py-3 rounded-xl mt-8"
-        >
-          <Text>{isPlaying ? 'Pause' : 'Resume'}</Text>
-        </Pressable>
+        <View className="flex-row justify-between items-center w-full px-1">
+          <Text className="text-xs text-white">{formatTime(position)}</Text>
+          <Text className="text-xs text-white">{formatTime(duration)}</Text>
+        </View>
+
+        <View className="flex-row gap-6 mt-8 items-center">
+          <Pressable onPress={cyclePlayMode}>
+            <Text className="text-white text-xs">{playMode}</Text>
+          </Pressable>
+          <Pressable onPress={playPrev}>
+            <Text className="text-white text-xl">⏮</Text>
+          </Pressable>
+
+          <Pressable onPress={togglePauseResume}>
+            <Text className="text-white text-xl">{isPlaying ? '⏸' : '▶'}</Text>
+          </Pressable>
+
+          <Pressable onPress={playNext}>
+            <Text className="text-white text-xl">⏭</Text>
+          </Pressable>
+
+          <Pressable>
+            <Text>❤️</Text>
+          </Pressable>
+        </View>
       </View>
     );
   }

@@ -1,4 +1,10 @@
-import React, { useState, useRef, createContext, useContext, use } from 'react';
+import React, {
+  useState,
+  useRef,
+  createContext,
+  useContext,
+  useEffect,
+} from 'react';
 import { Audio } from 'expo-av';
 
 type Song = {
@@ -10,18 +16,24 @@ type Song = {
 };
 
 type PlayerMode = 'mini' | 'full';
+type PlayMode = 'repeat-all' | 'repeat-one' | 'shuffle';
 
 type PlayerCtx = {
   sound: Audio.Sound | null;
   currentSong: Song | null;
   isPlaying: boolean;
+  loadQueue: (songs: Song[], index: number) => Promise<void>;
   playSong: (song: Song) => Promise<void>;
   togglePauseResume: () => Promise<void>;
-  mode: PlayerMode;
-  setMode: (m: PlayerMode) => void;
+  cyclePlayMode: () => void;
+  playPrev: () => Promise<void>;
+  autoPlay: () => Promise<void>;
+  playNext: () => Promise<void>;
+  playerMode: PlayerMode;
+  setPlayerMode: (m: PlayerMode) => void;
   position: number;
   duration: number;
-  seekTo: (millis: number) => void;
+  playMode: PlayMode;
 };
 
 const PlayerContext = createContext<PlayerCtx | null>(null);
@@ -31,9 +43,24 @@ export const PlayerProvider = ({ children }: any) => {
   const loadingRef = useRef(false);
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [mode, setMode] = useState<PlayerMode>('mini');
+  const [queue, setQueue] = useState<Song[]>([]);
+  const queueRef = useRef<Song[]>([]);
+  const [currentIndex, setCurrentIndex] = useState<number>(-1);
+  const indexRef = useRef<number>(-1);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [playMode, setPlayMode] = useState<PlayMode>('repeat-one');
+  const playModeRef = useRef(playMode);
+  const [playerMode, setPlayerMode] = useState<PlayerMode>('mini');
+
+  const loadQueue = async (songs: Song[], index: number) => {
+    setQueue(songs);
+    setCurrentIndex(index);
+
+    queueRef.current = songs;
+    indexRef.current = index;
+    await playSong(songs[index]);
+  };
 
   const playSong = async (song: Song) => {
     if (loadingRef.current) {
@@ -55,7 +82,7 @@ export const PlayerProvider = ({ children }: any) => {
       soundRef.current = sound;
       setCurrentSong(song);
       setIsPlaying(true);
-      setMode('full');
+      setPlayerMode('full');
 
       sound.setOnPlaybackStatusUpdate((status) => {
         if (!status.isLoaded) {
@@ -66,7 +93,7 @@ export const PlayerProvider = ({ children }: any) => {
         setDuration(status.durationMillis ?? 0);
 
         if (status.didJustFinish) {
-          setIsPlaying(false);
+          autoPlay();
         }
       });
     } catch (e) {
@@ -90,11 +117,76 @@ export const PlayerProvider = ({ children }: any) => {
     }
   };
 
-  const seekTo = async (millis: number) => {
-    if (!soundRef.current) {
+  const cyclePlayMode = () => {
+    setPlayMode((m) =>
+      m === 'repeat-all'
+        ? 'repeat-one'
+        : m === 'repeat-one'
+          ? 'shuffle'
+          : 'repeat-all',
+    );
+  };
+
+  useEffect(() => {
+    queueRef.current = queue;
+  }, [queue]);
+
+  useEffect(() => {
+    indexRef.current = currentIndex;
+  }, [currentIndex]);
+
+  useEffect(() => {
+    playModeRef.current = playMode;
+  }, [playMode]);
+
+  const playPrev = async () => {
+    const q = queueRef.current;
+    if (q.length === 0) {
       return;
     }
-    soundRef.current.setPositionAsync(millis);
+
+    const prev = indexRef.current === 0 ? q.length - 1 : indexRef.current - 1;
+
+    indexRef.current = prev;
+    setCurrentIndex(prev);
+
+    await playSong(q[prev]);
+  };
+
+  const autoPlay = async () => {
+    const q = queueRef.current;
+    if (q.length === 0) {
+      return;
+    }
+
+    const mode = playModeRef.current;
+    let nextIndex = indexRef.current;
+
+    if (mode === 'repeat-one') {
+    } else if (mode === 'shuffle') {
+      nextIndex = Math.floor(Math.random() * q.length);
+    } else {
+      nextIndex = (indexRef.current + 1) % q.length;
+    }
+
+    indexRef.current = nextIndex;
+    setCurrentIndex(nextIndex);
+
+    await playSong(q[nextIndex]);
+  };
+
+  const playNext = async () => {
+    const q = queueRef.current;
+    if (q.length === 0) {
+      return;
+    }
+
+    const next = (indexRef.current + 1) % q.length;
+
+    indexRef.current = next;
+    setCurrentIndex(next);
+
+    await playSong(queue[next]);
   };
 
   return (
@@ -103,13 +195,18 @@ export const PlayerProvider = ({ children }: any) => {
         sound: soundRef.current,
         currentSong,
         isPlaying,
+        loadQueue,
         playSong,
         togglePauseResume,
-        mode,
-        setMode,
+        cyclePlayMode,
+        playPrev,
+        autoPlay,
+        playNext,
+        playerMode,
+        setPlayerMode,
         position,
         duration,
-        seekTo,
+        playMode,
       }}
     >
       {children}

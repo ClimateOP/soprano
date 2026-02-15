@@ -26,7 +26,7 @@ export default function Songs() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const { playSong } = usePlayer();
+  const { loadQueue } = usePlayer();
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -51,7 +51,7 @@ export default function Songs() {
     }, []),
   );
 
-  const filtered = songs.filter((s) =>
+  const filteredSongs = songs.filter((s) =>
     (s.track + '' + s.artist).toLowerCase().includes(query.toLowerCase()),
   );
 
@@ -97,14 +97,19 @@ export default function Songs() {
       </View>
       <View className="flex-1 p-2">
         <FlatList
-          data={filtered}
+          data={filteredSongs}
           keyExtractor={(item) => item.id}
           ListEmptyComponent={<Text>No Songs Downloaded</Text>}
           renderItem={({ item }) => (
             <Pressable
-              onPress={() =>
-                selectMode ? toggleSelect(item.id) : playSong(item)
-              }
+              onPress={() => {
+                if (selectMode) {
+                  toggleSelect(item.id);
+                } else {
+                  const index = filteredSongs.findIndex((s) => s.id == item.id);
+                  loadQueue(filteredSongs, index);
+                }
+              }}
               className="flex-row gap-3 my-2 bg-white p-2 rounded"
             >
               <Image
