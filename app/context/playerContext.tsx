@@ -25,24 +25,37 @@ const PlayerContext = createContext<PlayerCtx | null>(null);
 
 export const PlayerProvider = ({ children }: any) => {
   const soundRef = useRef<Audio.Sound | null>(null);
+  const loadingRef = useRef(false);
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [mode, setMode] = useState<PlayerMode>('mini');
 
   const playSong = async (song: Song) => {
-    if (soundRef.current) {
-      await soundRef.current.unloadAsync();
+    if (loadingRef.current) {
+      return;
     }
+    loadingRef.current = true;
 
-    const { sound } = await Audio.Sound.createAsync(
-      { uri: song.fileUri },
-      { shouldPlay: true },
-    );
+    try {
+      if (soundRef.current) {
+        await soundRef.current.stopAsync();
+        await soundRef.current.unloadAsync();
+      }
 
-    soundRef.current = sound;
-    setCurrentSong(song);
-    setIsPlaying(true);
-    setMode('full');
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: song.fileUri },
+        { shouldPlay: true },
+      );
+
+      soundRef.current = sound;
+      setCurrentSong(song);
+      setIsPlaying(true);
+      setMode('full');
+    } catch (e) {
+      console.error(e);
+    } finally {
+      loadingRef.current = false;
+    }
   };
 
   const togglePauseResume = async () => {
