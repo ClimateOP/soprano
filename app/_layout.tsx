@@ -3,7 +3,7 @@ import { Stack } from 'expo-router';
 import { Audio } from 'expo-av';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { PlayerProvider } from './context/player';
+import { PlayerProvider } from './context/playerContext';
 import '../global.css';
 import { useEffect } from 'react';
 import MiniPlayer from './components/miniPlayer';

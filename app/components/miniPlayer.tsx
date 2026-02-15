@@ -1,24 +1,70 @@
-import { View, Text, TouchableOpacity } from 'react-native';
-import { usePlayer } from '../context/player';
+import { View, Text, BackHandler, Pressable, Image } from 'react-native';
+import { useEffect } from 'react';
+import { usePlayer } from '../context/playerContext';
 
 export default function MiniPlayer() {
-  const { currentSong, isPlaying, togglePauseResume } = usePlayer();
+  const { currentSong, isPlaying, togglePauseResume, mode, setMode } =
+    usePlayer();
+
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (mode === 'full') {
+        setMode('mini');
+        return true;
+      }
+      return false;
+    });
+    return () => sub.remove();
+  }, [mode]);
 
   if (!currentSong) {
     return null;
   }
 
-  return (
-    <View className="absolute left-3 right-3 bottom-20 h-16 bg-zinc-900 rounded-2xl px-4 flex-row items-center shadow-lg">
-      <Text numberOfLines={1} className="text-white flex-1">
-        {currentSong.track}
-      </Text>
+  if (mode == 'mini') {
+    return (
+      <Pressable
+        onPress={() => setMode('full')}
+        className="absolute bottom-16 left-2 right-2 bg-zinc-900 p-3 rounded-xl flex-row items-center gap-3"
+      >
+        <Image
+          source={{ uri: currentSong.thumbnailUri }}
+          style={{ width: 48, height: 48, borderRadius: 8 }}
+        />
+        <View className="flex-1">
+          <Text className="text-white">{currentSong.track}</Text>
+          <Text className="text-gray-400 text-xs">{currentSong.artist}</Text>
+        </View>
+        <Pressable onPress={togglePauseResume}>
+          <Text className="text-white">{isPlaying ? 'Pause' : 'Resume'}</Text>
+        </Pressable>
+      </Pressable>
+    );
+  } else {
+    return (
+      <View className="absolute inset-0 bg-black p-6 justify-center items-center">
+        <Pressable
+          onPress={() => setMode('mini')}
+          className="absolute top-12 left-6"
+        >
+          <Text className="text-white text-lg">↓</Text>
+        </Pressable>
 
-      <TouchableOpacity onPress={togglePauseResume}>
-        <Text className="text-white font-semibold">
-          {isPlaying ? 'Pause' : 'Play'}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
+        <Image
+          source={{ uri: currentSong.thumbnailUri }}
+          style={{ width: 260, height: 260, borderRadius: 20 }}
+        />
+
+        <Text className="text-white text-xl mt-6">{currentSong.track}</Text>
+        <Text className="text-gray-400">{currentSong.artist}</Text>
+
+        <Pressable
+          onPress={togglePauseResume}
+          className="bg-white px-6 py-3 rounded-xl mt-8"
+        >
+          <Text>{isPlaying ? 'Pause' : 'Resume'}</Text>
+        </Pressable>
+      </View>
+    );
+  }
 }

@@ -9,10 +9,9 @@ import {
   TextInput,
   BackHandler,
 } from 'react-native';
-import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system/legacy';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { usePlayer } from '../context/player';
+import { usePlayer } from '../context/playerContext';
 
 type Song = {
   id: string;
@@ -25,10 +24,9 @@ type Song = {
 export default function Songs() {
   const [query, setQuery] = useState('');
   const [songs, setSongs] = useState<Song[]>([]);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const { play } = usePlayer();
+  const { playSong } = usePlayer();
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -52,19 +50,6 @@ export default function Songs() {
       loadSongs();
     }, []),
   );
-
-  const playSong = async (uri: string) => {
-    if (sound) {
-      await sound.unloadAsync();
-    }
-
-    const { sound: s } = await Audio.Sound.createAsync(
-      { uri },
-      { shouldPlay: true },
-    );
-
-    setSound(s);
-  };
 
   const filtered = songs.filter((s) =>
     (s.track + '' + s.artist).toLowerCase().includes(query.toLowerCase()),
@@ -117,7 +102,9 @@ export default function Songs() {
           ListEmptyComponent={<Text>No Songs Downloaded</Text>}
           renderItem={({ item }) => (
             <Pressable
-              onPress={() => (selectMode ? toggleSelect(item.id) : play(item))}
+              onPress={() =>
+                selectMode ? toggleSelect(item.id) : playSong(item)
+              }
               className="flex-row gap-3 my-2 bg-white p-2 rounded"
             >
               <Image

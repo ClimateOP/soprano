@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  createContext,
-  useContext,
-  Children,
-} from 'react';
+import React, { useState, useRef, createContext, useContext } from 'react';
 import { Audio } from 'expo-av';
 
 type Song = {
@@ -15,11 +9,16 @@ type Song = {
   thumbnailUri: string;
 };
 
+type PlayerMode = 'mini' | 'full';
+
 type PlayerCtx = {
+  sound: Audio.Sound | null;
   currentSong: Song | null;
   isPlaying: boolean;
-  play: (song: Song) => Promise<void>;
+  playSong: (song: Song) => Promise<void>;
   togglePauseResume: () => Promise<void>;
+  mode: PlayerMode;
+  setMode: (m: PlayerMode) => void;
 };
 
 const PlayerContext = createContext<PlayerCtx | null>(null);
@@ -28,8 +27,9 @@ export const PlayerProvider = ({ children }: any) => {
   const soundRef = useRef<Audio.Sound | null>(null);
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [mode, setMode] = useState<PlayerMode>('mini');
 
-  const play = async (song: Song) => {
+  const playSong = async (song: Song) => {
     if (soundRef.current) {
       await soundRef.current.unloadAsync();
     }
@@ -42,6 +42,7 @@ export const PlayerProvider = ({ children }: any) => {
     soundRef.current = sound;
     setCurrentSong(song);
     setIsPlaying(true);
+    setMode('full');
   };
 
   const togglePauseResume = async () => {
@@ -60,7 +61,15 @@ export const PlayerProvider = ({ children }: any) => {
 
   return (
     <PlayerContext.Provider
-      value={{ currentSong, isPlaying, play, togglePauseResume }}
+      value={{
+        sound: soundRef.current,
+        currentSong,
+        isPlaying,
+        playSong,
+        togglePauseResume,
+        mode,
+        setMode,
+      }}
     >
       {children}
     </PlayerContext.Provider>
