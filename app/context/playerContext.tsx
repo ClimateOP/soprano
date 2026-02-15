@@ -1,4 +1,4 @@
-import React, { useState, useRef, createContext, useContext } from 'react';
+import React, { useState, useRef, createContext, useContext, use } from 'react';
 import { Audio } from 'expo-av';
 
 type Song = {
@@ -19,6 +19,9 @@ type PlayerCtx = {
   togglePauseResume: () => Promise<void>;
   mode: PlayerMode;
   setMode: (m: PlayerMode) => void;
+  position: number;
+  duration: number;
+  seekTo: (millis: number) => void;
 };
 
 const PlayerContext = createContext<PlayerCtx | null>(null);
@@ -29,6 +32,8 @@ export const PlayerProvider = ({ children }: any) => {
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [mode, setMode] = useState<PlayerMode>('mini');
+  const [position, setPosition] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   const playSong = async (song: Song) => {
     if (loadingRef.current) {
@@ -51,6 +56,19 @@ export const PlayerProvider = ({ children }: any) => {
       setCurrentSong(song);
       setIsPlaying(true);
       setMode('full');
+
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (!status.isLoaded) {
+          return;
+        }
+
+        setPosition(status.positionMillis);
+        setDuration(status.durationMillis ?? 0);
+
+        if (status.didJustFinish) {
+          setIsPlaying(false);
+        }
+      });
     } catch (e) {
       console.error(e);
     } finally {
@@ -72,6 +90,13 @@ export const PlayerProvider = ({ children }: any) => {
     }
   };
 
+  const seekTo = async (millis: number) => {
+    if (!soundRef.current) {
+      return;
+    }
+    soundRef.current.setPositionAsync(millis);
+  };
+
   return (
     <PlayerContext.Provider
       value={{
@@ -82,6 +107,9 @@ export const PlayerProvider = ({ children }: any) => {
         togglePauseResume,
         mode,
         setMode,
+        position,
+        duration,
+        seekTo,
       }}
     >
       {children}

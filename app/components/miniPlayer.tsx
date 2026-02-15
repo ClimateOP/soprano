@@ -1,10 +1,19 @@
 import { View, Text, BackHandler, Pressable, Image } from 'react-native';
+import Slider from '@react-native-community/slider';
 import { useEffect } from 'react';
 import { usePlayer } from '../context/playerContext';
 
 export default function MiniPlayer() {
-  const { currentSong, isPlaying, togglePauseResume, mode, setMode } =
-    usePlayer();
+  const {
+    sound,
+    currentSong,
+    isPlaying,
+    togglePauseResume,
+    mode,
+    setMode,
+    position,
+    duration,
+  } = usePlayer();
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -57,6 +66,18 @@ export default function MiniPlayer() {
 
         <Text className="text-white text-xl mt-6">{currentSong.track}</Text>
         <Text className="text-gray-400">{currentSong.artist}</Text>
+
+        <Slider
+          style={{ width: '100%', height: 40 }}
+          minimumValue={0}
+          maximumValue={duration || 1}
+          value={position}
+          onSlidingComplete={async (value) => {
+            if (sound) {
+              await sound.setPositionAsync(value);
+            }
+          }}
+        />
 
         <Pressable
           onPress={togglePauseResume}
