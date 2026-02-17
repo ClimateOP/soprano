@@ -22,8 +22,8 @@ type Song = {
 };
 
 export default function Songs() {
-  const [query, setQuery] = useState('');
   const [songs, setSongs] = useState<Song[]>([]);
+  const [query, setQuery] = useState('');
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const { loadQueue } = usePlayer();

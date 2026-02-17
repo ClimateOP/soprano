@@ -45,7 +45,7 @@ export default function MiniPlayer() {
     return (
       <Pressable
         onPress={() => setPlayerMode('full')}
-        className="absolute bottom-16 left-2 right-2 bg-zinc-900 p-3 rounded-xl flex-row items-center gap-3"
+        className="absolute bottom-28 left-2 right-2 bg-zinc-900 p-3 rounded-xl flex-row items-center gap-3"
       >
         <Image
           source={{ uri: currentSong.thumbnailUri }}
