@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import {
   View,
   Text,
@@ -118,7 +118,10 @@ export default function Playlists() {
               onPress={() =>
                 selectMode
                   ? toggleSelect(item.id)
-                  : console.log('Playlist opened:', item.id)
+                  : router.push({
+                      pathname: '/screens/playlistOpen',
+                      params: { id: item.id },
+                    })
               }
               className="bg-white p-4 rounded my-2 flex-row justify-between"
             >

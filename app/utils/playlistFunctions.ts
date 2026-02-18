@@ -6,9 +6,15 @@ export type Playlist = {
   songIds: string[];
 };
 
+const KEY = 'playlists';
+
 export const getPlaylists = async (): Promise<Playlist[]> => {
-  const raw = await AsyncStorage.getItem('playlists');
+  const raw = await AsyncStorage.getItem(KEY);
   return raw ? JSON.parse(raw) : [];
+};
+
+export const savePlaylists = async (playlists: Playlist[]) => {
+  await AsyncStorage.setItem(KEY, JSON.stringify(playlists));
 };
 
 export const createPlaylist = async (name: string) => {
@@ -22,7 +28,7 @@ export const createPlaylist = async (name: string) => {
 
   const updatedLists = [...lists, newList];
 
-  await AsyncStorage.setItem('playlists', JSON.stringify(updatedLists));
+  await savePlaylists(updatedLists);
 };
 
 export const addSongsToPlaylists = async (
@@ -43,7 +49,7 @@ export const addSongsToPlaylists = async (
     }
   }
 
-  await AsyncStorage.setItem('playlists', JSON.stringify(lists));
+  await savePlaylists(lists);
 };
 
 export const removeSongsfromPlaylists = async (
@@ -60,7 +66,7 @@ export const removeSongsfromPlaylists = async (
     list.songIds = list.songIds.filter((id) => !songIds.includes(id));
   }
 
-  await AsyncStorage.setItem('playlists', JSON.stringify(lists));
+  await savePlaylists(lists);
 };
 
 export const deletePlaylists = async (playlistIds: string[]) => {
@@ -68,5 +74,5 @@ export const deletePlaylists = async (playlistIds: string[]) => {
 
   const updatedLists = lists.filter((p) => !playlistIds.includes(p.id));
 
-  await AsyncStorage.setItem('playlists', JSON.stringify(updatedLists));
+  await savePlaylists(updatedLists);
 };

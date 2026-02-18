@@ -9,17 +9,9 @@ import {
   TextInput,
   BackHandler,
 } from 'react-native';
-import * as FileSystem from 'expo-file-system/legacy';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { usePlayer } from '../context/playerContext';
 
-type Song = {
-  id: string;
-  track: string;
-  artist: string;
-  fileUri: string;
-  thumbnailUri: string;
-};
+import { Song, getSongs, deleteSongs } from '../utils/songFunctions';
 
 export default function Songs() {
   const [songs, setSongs] = useState<Song[]>([]);
@@ -41,8 +33,7 @@ export default function Songs() {
   }, [selectMode]);
 
   const loadSongs = async () => {
-    const data = await AsyncStorage.getItem('songs');
-    setSongs(data ? JSON.parse(data) : []);
+    setSongs(await getSongs());
   };
 
   useFocusEffect(
@@ -61,20 +52,11 @@ export default function Songs() {
     );
   };
 
-  const deleteSongs = async () => {
-    const remaining = songs.filter((s) => !selectedIds.includes(s.id));
-
-    for (const s of songs) {
-      if (selectedIds.includes(s.id)) {
-        await FileSystem.deleteAsync(s.fileUri, { idempotent: true });
-        await FileSystem.deleteAsync(s.thumbnailUri, { idempotent: true });
-      }
-    }
-
-    await AsyncStorage.setItem('songs', JSON.stringify(remaining));
-    setSongs(remaining);
-    setSelectedIds([]);
+  const handleDelete = async () => {
+    await deleteSongs(selectedIds);
     setSelectMode(false);
+    setSelectedIds([]);
+    loadSongs();
   };
 
   return (
@@ -143,7 +125,7 @@ export default function Songs() {
             <Pressable onPress={() => console.log('Playlists')}>
               <Text>❤️</Text>
             </Pressable>
-            <Pressable onPress={deleteSongs}>
+            <Pressable onPress={handleDelete}>
               <Text>Delete</Text>
             </Pressable>
           </View>
