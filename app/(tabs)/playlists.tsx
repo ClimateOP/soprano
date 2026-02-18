@@ -68,10 +68,14 @@ export default function Playlists() {
   };
 
   const handleDelete = async () => {
-    await deletePlaylists(selectedIds);
-    setSelectMode(false);
-    setSelectedIds([]);
-    loadPlaylists();
+    if (selectedIds.length > 0) {
+      await deletePlaylists(selectedIds);
+      setSelectMode(false);
+      setSelectedIds([]);
+      loadPlaylists();
+    } else {
+      console.log('Select songs first pop up');
+    }
   };
 
   return (
@@ -127,7 +131,7 @@ export default function Playlists() {
             >
               <Text>{item.name}</Text>
               {selectMode && (
-                <Text>{selectedIds.includes(item.id) ? '✓' : ''}</Text>
+                <Text>{selectedIds.includes(item.id) ? '☑️' : '⬜'}</Text>
               )}
             </Pressable>
           );

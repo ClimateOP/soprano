@@ -46,24 +46,30 @@ export default function Songs() {
     (s.track + '' + s.artist).toLowerCase().includes(query.toLowerCase()),
   );
 
-  const toggleSelect = (id: string) => {
+  const toggleSelect = (songId: string) => {
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+      prev.includes(songId)
+        ? prev.filter((id) => id !== songId)
+        : [...prev, songId],
     );
   };
 
   const handleDelete = async () => {
-    await deleteSongs(selectedIds);
-    setSelectMode(false);
-    setSelectedIds([]);
-    loadSongs();
+    if (selectedIds.length > 0) {
+      await deleteSongs(selectedIds);
+      setSelectMode(false);
+      setSelectedIds([]);
+      loadSongs();
+    } else {
+      console.log('Select songs first pop up');
+    }
   };
 
   return (
     <>
       <View className="flex-row gap-2 p-4">
         <TextInput
-          placeholder="Search song..."
+          placeholder="Search Song..."
           value={query}
           onChangeText={setQuery}
           className="border p-3 rounded flex-1"
@@ -88,7 +94,9 @@ export default function Songs() {
                 if (selectMode) {
                   toggleSelect(item.id);
                 } else {
-                  const index = filteredSongs.findIndex((s) => s.id == item.id);
+                  const index = filteredSongs.findIndex(
+                    (s) => s.id === item.id,
+                  );
                   loadQueue(filteredSongs, index);
                 }
               }}
@@ -104,7 +112,7 @@ export default function Songs() {
                 <Text>{item.artist}</Text>
               </View>
               {selectMode && (
-                <View>{selectedIds.includes(item.id) && <Text>✓</Text>}</View>
+                <Text>{selectedIds.includes(item.id) ? '☑️' : '⬜'}</Text>
               )}
             </Pressable>
           )}
