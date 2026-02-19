@@ -99,7 +99,7 @@ export default function Playlists() {
 
       <FlatList
         data={[
-          ...filteredLists,
+          ...filteredLists.reverse(),
           { id: '__add__', name: '__add__', songIds: [] },
         ]}
         keyExtractor={(item) => item.id}

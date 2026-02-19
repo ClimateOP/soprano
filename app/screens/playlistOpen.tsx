@@ -120,7 +120,7 @@ export default function PlaylistOpen() {
 
       <View className="flex-1 p-2">
         <FlatList
-          data={filteredSongs}
+          data={[...filteredSongs].reverse()}
           keyExtractor={(item) => item.id}
           ListEmptyComponent={
             <Text>No Songs in {playlist?.name ?? 'this Playlist'}</Text>

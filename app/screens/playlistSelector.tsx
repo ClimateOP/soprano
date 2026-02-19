@@ -36,8 +36,13 @@ export default function PlaylistSelector() {
   };
 
   const handleAdd = async () => {
-    await addSongsToPlaylists(selectedIds, parsedSongIds);
-    router.back();
+    if (selectedIds.length > 0) {
+      await addSongsToPlaylists(selectedIds, parsedSongIds);
+      setSelectedIds([]);
+      router.back();
+    } else {
+      console.log('Select playlists first pop up');
+    }
   };
 
   return (

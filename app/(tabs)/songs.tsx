@@ -85,7 +85,7 @@ export default function Songs() {
       </View>
       <View className="flex-1 p-2">
         <FlatList
-          data={filteredSongs}
+          data={[...filteredSongs].reverse()}
           keyExtractor={(item) => item.id}
           ListEmptyComponent={<Text>No Songs Downloaded</Text>}
           renderItem={({ item }) => (
