@@ -18,7 +18,7 @@ import {
 } from '../utils/playlistFunctions';
 
 export default function Playlists() {
-  const [lists, setLists] = useState<Playlist[]>([]);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [query, setQuery] = useState('');
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -38,7 +38,7 @@ export default function Playlists() {
   }, [selectMode]);
 
   const loadPlaylists = async () => {
-    setLists(await getPlaylists());
+    setPlaylists(await getPlaylists());
   };
 
   useFocusEffect(
@@ -47,7 +47,7 @@ export default function Playlists() {
     }, []),
   );
 
-  const filteredLists = lists.filter((p) =>
+  const filteredLists = playlists.filter((p) =>
     p.name.toLowerCase().includes(query.toLowerCase()),
   );
 

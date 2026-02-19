@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import {
   View,
   Text,
@@ -130,7 +130,14 @@ export default function Songs() {
             >
               <Text>Cancel</Text>
             </Pressable>
-            <Pressable onPress={() => console.log('Playlists')}>
+            <Pressable
+              onPress={() =>
+                router.push({
+                  pathname: '/screens/playlistSelector',
+                  params: { songIds: JSON.stringify(selectedIds) },
+                })
+              }
+            >
               <Text>❤️</Text>
             </Pressable>
             <Pressable onPress={handleDelete}>

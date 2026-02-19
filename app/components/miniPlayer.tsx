@@ -2,6 +2,7 @@ import { View, Text, BackHandler, Pressable, Image } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useEffect } from 'react';
 import { usePlayer } from '../context/playerContext';
+import { router } from 'expo-router';
 
 export default function MiniPlayer() {
   const {
@@ -121,7 +122,15 @@ export default function MiniPlayer() {
             <Text className="text-white text-xl">⏭</Text>
           </Pressable>
 
-          <Pressable>
+          <Pressable
+            onPress={() => {
+              setPlayerMode('mini');
+              router.push({
+                pathname: '/screens/playlistSelector',
+                params: { songIds: JSON.stringify([currentSong.id]) },
+              });
+            }}
+          >
             <Text>❤️</Text>
           </Pressable>
         </View>

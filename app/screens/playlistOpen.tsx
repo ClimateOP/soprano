@@ -91,7 +91,7 @@ export default function PlaylistOpen() {
   };
 
   return (
-    <>
+    <View className="flex-1 mt-10">
       <View className="flex-row items-center gap-3 p-4">
         <Pressable onPress={() => router.back()}>
           <Text>←</Text>
@@ -172,6 +172,6 @@ export default function PlaylistOpen() {
           </Pressable>
         </View>
       )}
-    </>
+    </View>
   );
 }

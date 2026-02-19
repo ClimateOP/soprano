@@ -92,7 +92,7 @@ export default function Download() {
   return (
     <View className="flex-1 p-4 gap-3">
       <TextInput
-        placeholder="Search song..."
+        placeholder="Search Song..."
         value={query}
         onChangeText={setQuery}
         className="border p-3 rounded"
