@@ -23,6 +23,8 @@ export default function Download() {
   const [trackInput, setTrackInput] = useState('');
   const [artistInput, setArtistInput] = useState('');
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const handleSearch = async () => {
     setResults(await searchSong(query));
@@ -37,7 +39,10 @@ export default function Download() {
     track: string,
     artist: string,
   ) => {
-    await downloadSong(item, track, artist);
+    setDownloading(true);
+    setProgress(0);
+    await downloadSong(item, track, artist, setProgress);
+    setDownloading(false);
   };
 
   return (
@@ -125,6 +130,21 @@ export default function Download() {
           </Pressable>
         </Pressable>
       </Modal>
+      {downloading && (
+        <View className="absolute inset-0 bg-black/60 justify-center items-center px-6">
+          <View className="w-full max-w-sm bg-white rounded-2xl p-6 shadow-xl">
+            <Text className="text-lg font-semibold text-gray-800 mb-4 text-center">
+              Downloading...
+            </Text>
+            <View className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+              <View
+                style={{ width: `${progress * 100}%` }}
+                className="h-full bg-blue-500 rounded-full"
+              />
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   );
 }

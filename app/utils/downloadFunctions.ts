@@ -30,19 +30,39 @@ export const searchSong = async (query: string) => {
   return data;
 };
 
+const downloadWithProgress = async (
+  url: string,
+  uri: string,
+  setProgress: (p: number) => void,
+) => {
+  const downloadResumable = FileSystem.createDownloadResumable(
+    url,
+    uri,
+    {},
+    ({ totalBytesWritten, totalBytesExpectedToWrite }) => {
+      const prog = totalBytesWritten / totalBytesExpectedToWrite;
+      setProgress(prog);
+    },
+  );
+
+  await downloadResumable.downloadAsync();
+};
+
 export const downloadSong = async (
   item: SearchItem,
   track: string,
   artist: string,
+  setProgress: (p: number) => void,
 ) => {
   const fileUri = SONG_DIR + item.id + '.mp3';
   const thumbnailUri = SONG_DIR + item.id + '.jpg';
 
-  await FileSystem.downloadAsync(
+  await downloadWithProgress(
     `http://192.168.100.7:3000/download?url=${encodeURIComponent(item.webpage_url)}`,
     fileUri,
+    setProgress,
   );
-  await FileSystem.downloadAsync(item.thumbnail, thumbnailUri);
+  await downloadWithProgress(item.thumbnail, thumbnailUri, setProgress);
 
   const stored = JSON.parse((await AsyncStorage.getItem(KEY)) || '[]');
 
