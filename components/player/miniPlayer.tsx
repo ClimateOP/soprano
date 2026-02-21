@@ -1,7 +1,7 @@
 import { View, Text, BackHandler, Pressable, Image } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useEffect } from 'react';
-import { usePlayer } from '../context/playerContext';
+import { usePlayer } from '../../context/playerContext';
 import { router } from 'expo-router';
 
 export default function MiniPlayer() {

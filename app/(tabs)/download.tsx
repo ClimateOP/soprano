@@ -14,7 +14,9 @@ import {
   searchSong,
   downloadSong,
   makeDirectory,
-} from '../utils/downloadFunctions';
+} from '@/utils/downloadFunctions';
+import { SearchBar } from '@/components/ui/searchbar';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Download() {
   const [query, setQuery] = useState('');
@@ -23,11 +25,14 @@ export default function Download() {
   const [trackInput, setTrackInput] = useState('');
   const [artistInput, setArtistInput] = useState('');
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [progress, setProgress] = useState(0);
 
   const handleSearch = async () => {
+    setLoading(true);
     setResults(await searchSong(query));
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -47,40 +52,52 @@ export default function Download() {
 
   return (
     <View className="flex-1 p-4 gap-3">
-      <TextInput
-        placeholder="Search Song..."
+      <SearchBar
+        placeholder="Search songs..."
         value={query}
         onChangeText={setQuery}
-        className="border p-3 rounded"
+        onSubmitEditing={handleSearch}
       />
-
-      <Button title="Search" onPress={handleSearch} />
-
-      <FlatList
-        data={result}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Pressable
-            className="flex-row gap-3 my-2"
-            onPress={() => {
-              console.log('ROW PRESSED');
-              setSelectedItem(item);
-              setTrackInput(item.track ?? item.title ?? '');
-              setArtistInput(item.artist ?? item.uploader ?? '');
-              setSheetOpen(true);
-            }}
-          >
-            <Image
-              source={{ uri: item.thumbnail }}
-              style={{ width: 80, height: 80 }}
-            />
-            <View className="flex-1">
-              <Text numberOfLines={2}>{item.title}</Text>
-              <Text>{item.uploader}</Text>
+      {loading ? (
+        <View className="gap-4 rounded-md">
+          {[...Array(6)].map((_, i) => (
+            <View key={i} className="flex-row gap-3">
+              <Skeleton width={80} height={80} style={{ borderRadius: 25 }} />
+              <View className="flex-1 gap-2 pt-2">
+                <Skeleton width={`75%`} height={16} />
+                <Skeleton width={`50%`} height={16} />
+              </View>
             </View>
-          </Pressable>
-        )}
-      />
+          ))}
+        </View>
+      ) : (
+        <FlatList
+          data={result}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Pressable
+              className="flex-row gap-3 my-2 bg-white rounded"
+              onPress={() => {
+                console.log('ROW PRESSED');
+                setSelectedItem(item);
+                setTrackInput(item.track ?? item.title ?? '');
+                setArtistInput(item.artist ?? item.uploader ?? '');
+                setSheetOpen(true);
+              }}
+            >
+              <Image
+                source={{ uri: item.thumbnail }}
+                style={{ width: 80, height: 80 }}
+              />
+              <View className="flex-1">
+                <Text numberOfLines={2}>{item.title}</Text>
+                <Text>{item.uploader}</Text>
+              </View>
+            </Pressable>
+          )}
+        />
+      )}
+
       <Modal
         visible={sheetOpen}
         transparent

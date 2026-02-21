@@ -4,22 +4,20 @@
     "slug": "soprano",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./app/assets/images/icon.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "soprano",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "UIBackgroundModes": [
-          "audio"
-        ]
+        "UIBackgroundModes": ["audio"]
       }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./app/assets/images/icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundImage": "",
         "monochromeImage": ""
       },
@@ -33,14 +31,14 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./app/assets/images/favicon-16x16.png"
+      "favicon": "./assets/images/favicon-16x16.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./app/assets/images/icon.png",
+          "image": "./assets/images/icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",

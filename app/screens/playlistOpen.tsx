@@ -9,13 +9,13 @@ import {
   BackHandler,
 } from 'react-native';
 import { useLocalSearchParams, useFocusEffect, router } from 'expo-router';
-import { usePlayer } from '../context/playerContext';
-import { Song, deleteSongs, getSongs } from '../utils/songFunctions';
+import { usePlayer } from '@/context/playerContext';
+import { Song, deleteSongs, getSongs } from '@/utils/songFunctions';
 import {
   Playlist,
   getPlaylists,
   removeSongsfromPlaylists,
-} from '../utils/playlistFunctions';
+} from '@/utils/playlistFunctions';
 
 export default function PlaylistOpen() {
   const [songs, setSongs] = useState<Song[]>([]);

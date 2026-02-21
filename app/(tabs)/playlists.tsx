@@ -15,7 +15,9 @@ import {
   getPlaylists,
   createPlaylist,
   deletePlaylists,
-} from '../utils/playlistFunctions';
+} from '@/utils/playlistFunctions';
+import { SearchBar } from '@/components/ui/searchbar';
+import { Button } from '@/components/ui/button';
 
 export default function Playlists() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -81,19 +83,18 @@ export default function Playlists() {
   return (
     <>
       <View className="flex-row gap-2 p-4">
-        <TextInput
-          placeholder="Search Playlists..."
-          value={query}
-          onChangeText={setQuery}
-          className="border p-3 rounded flex-1"
-        ></TextInput>
+        <View className="flex-1 mr-2">
+          <SearchBar
+            placeholder="Search playlists..."
+            value={query}
+            onChangeText={setQuery}
+            className="flex-1"
+          />
+        </View>
         {!selectMode && (
-          <Pressable
-            onPress={() => setSelectMode(true)}
-            className="bg-gray-300 px-4 justify-center rounded"
-          >
+          <Button onPress={() => setSelectMode(true)}>
             <Text>Select</Text>
-          </Pressable>
+          </Button>
         )}
       </View>
 

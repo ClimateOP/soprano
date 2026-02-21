@@ -5,7 +5,7 @@ import {
   Playlist,
   addSongsToPlaylists,
   getPlaylists,
-} from '../utils/playlistFunctions';
+} from '@/utils/playlistFunctions';
 
 export default function PlaylistSelector() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
