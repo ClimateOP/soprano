@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   FlatList,
   Image,
   Pressable,
@@ -74,24 +73,33 @@ export default function Download() {
         <FlatList
           data={result}
           keyExtractor={(item) => item.id}
+          contentContainerClassName="p-1"
           renderItem={({ item }) => (
             <Pressable
-              className="flex-row gap-3 my-2 bg-white rounded"
               onPress={() => {
-                console.log('ROW PRESSED');
                 setSelectedItem(item);
                 setTrackInput(item.track ?? item.title ?? '');
                 setArtistInput(item.artist ?? item.uploader ?? '');
                 setSheetOpen(true);
               }}
+              className="flex-row items-center gap-3 my-2 p-3 rounded-2xl bg-[hsl(240,3%,11%)] active:opacity-80"
             >
               <Image
                 source={{ uri: item.thumbnail }}
-                style={{ width: 80, height: 80 }}
+                className="w-[70px] h-[70px] rounded-xl"
               />
+
               <View className="flex-1">
-                <Text numberOfLines={2}>{item.title}</Text>
-                <Text>{item.uploader}</Text>
+                <Text
+                  numberOfLines={2}
+                  className="text-white text-[15px] font-semibold"
+                >
+                  {item.title}
+                </Text>
+
+                <Text className="text-white/60 text-[13px] mt-1">
+                  {item.uploader}
+                </Text>
               </View>
             </Pressable>
           )}

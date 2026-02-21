@@ -6,7 +6,6 @@ import {
   FlatList,
   Pressable,
   Image,
-  TextInput,
   BackHandler,
 } from 'react-native';
 import { usePlayer } from '@/context/playerContext';
@@ -83,11 +82,12 @@ export default function Songs() {
           </Button>
         )}
       </View>
-      <View className="flex-1 p-2">
+      <View className="flex-1">
         <FlatList
           data={[...filteredSongs].reverse()}
           keyExtractor={(item) => item.id}
           ListEmptyComponent={<Text>No Songs Downloaded</Text>}
+          contentContainerClassName="p-4"
           renderItem={({ item }) => (
             <Pressable
               onPress={() => {
@@ -100,16 +100,23 @@ export default function Songs() {
                   loadQueue(filteredSongs, index);
                 }
               }}
-              className="flex-row gap-3 my-2 bg-white p-2 rounded"
+              className="flex-row items-center gap-3 my-2 p-3 rounded-2xl bg-[hsl(240,3%,11%)] active:opacity-80"
             >
               <Image
                 source={{ uri: item.thumbnailUri }}
-                style={{ width: 70, height: 70 }}
+                className="w-[70px] h-[70px] rounded-xl"
               />
 
               <View className="flex-1">
-                <Text numberOfLines={1}>{item.track}</Text>
-                <Text>{item.artist}</Text>
+                <Text
+                  numberOfLines={1}
+                  className="text-white text-[15px] font-semibold"
+                >
+                  {item.track}
+                </Text>
+                <Text className="text-white/60 text-[13px] mt-1">
+                  {item.artist}
+                </Text>
               </View>
               {selectMode && (
                 <Text>{selectedIds.includes(item.id) ? '☑️' : '⬜'}</Text>

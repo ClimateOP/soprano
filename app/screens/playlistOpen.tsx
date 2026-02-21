@@ -5,7 +5,6 @@ import {
   FlatList,
   Pressable,
   Image,
-  TextInput,
   BackHandler,
 } from 'react-native';
 import { useLocalSearchParams, useFocusEffect, router } from 'expo-router';
@@ -16,6 +15,10 @@ import {
   getPlaylists,
   removeSongsfromPlaylists,
 } from '@/utils/playlistFunctions';
+import { SearchBar } from '@/components/ui/searchbar';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react-native';
+import { Icon } from '@/components/ui/icon';
 
 export default function PlaylistOpen() {
   const [songs, setSongs] = useState<Song[]>([]);
@@ -92,38 +95,44 @@ export default function PlaylistOpen() {
 
   return (
     <View className="flex-1 mt-10">
-      <View className="flex-row items-center gap-3 p-4">
-        <Pressable onPress={() => router.back()}>
-          <Text>←</Text>
-        </Pressable>
-        <Text className="text-lg font-bold flex-1">
+      <View className="flex-row items-center justify-center gap-3 p-6">
+        <Button
+          onPress={() => router.back()}
+          variant="outline"
+          size="sm"
+          className="absolute left-3"
+        >
+          <Icon name={ArrowLeft} />
+        </Button>
+        <Text className="text-white text-2xl font-semibold">
           {playlist?.name ?? 'Playlist'}
         </Text>
       </View>
 
-      <View className="flex-row gap-2 px-4">
-        <TextInput
-          placeholder="Search Song..."
-          value={query}
-          onChangeText={setQuery}
-          className="border p-3 rounded flex-1"
-        />
+      <View className="flex-row gap-2 px-3 pt-2">
+        <View className="flex-1 mr-2">
+          <SearchBar
+            placeholder="Search Song..."
+            value={query}
+            onChangeText={setQuery}
+            className="flex-1"
+          />
+        </View>
         {!selectMode && (
-          <Pressable
-            onPress={() => setSelectMode(true)}
-            className="bg-gray-300 px-4 justify-center rounded"
-          >
+          <Button onPress={() => setSelectMode(true)}>
             <Text>Select</Text>
-          </Pressable>
+          </Button>
         )}
       </View>
 
-      <View className="flex-1 p-2">
+      <View className="flex-1 p-3 pt-2">
         <FlatList
           data={[...filteredSongs].reverse()}
           keyExtractor={(item) => item.id}
           ListEmptyComponent={
-            <Text>No Songs in {playlist?.name ?? 'this Playlist'}</Text>
+            <Text className="text-white text-[15px] font-semibold">
+              No Songs in {playlist?.name ?? 'this Playlist'}
+            </Text>
           }
           renderItem={({ item }) => (
             <Pressable
@@ -137,15 +146,22 @@ export default function PlaylistOpen() {
                   loadQueue(filteredSongs, index);
                 }
               }}
-              className="flex-row gap-3 my-2 bg-white p-2 rounded"
+              className="flex-row items-center gap-3 my-2 p-3 rounded-2xl bg-[hsl(240,3%,11%)] active:opacity-80"
             >
               <Image
                 source={{ uri: item.thumbnailUri }}
-                style={{ width: 70, height: 70 }}
+                className="w-[70px] h-[70px] rounded-xl"
               />
               <View className="flex-1">
-                <Text numberOfLines={1}>{item.track}</Text>
-                <Text>{item.artist}</Text>
+                <Text
+                  numberOfLines={1}
+                  className="text-white text-[15px] font-semibold"
+                >
+                  {item.track}
+                </Text>
+                <Text className="text-white/60 text-[13px] mt-1">
+                  {item.artist}
+                </Text>
               </View>
               {selectMode && (
                 <Text>{selectedIds.includes(item.id) ? '☑️' : '⬜'}</Text>

@@ -128,9 +128,11 @@ export default function Playlists() {
                       params: { id: item.id },
                     })
               }
-              className="bg-white p-4 rounded my-2 flex-row justify-between"
+              className="flex-row items-center gap-3 my-2 p-6 rounded-2xl bg-[hsl(240,3%,11%)] active:opacity-80 justify-between"
             >
-              <Text>{item.name}</Text>
+              <Text className="text-white text-[15px] font-semibold">
+                {item.name}
+              </Text>
               {selectMode && (
                 <Text>{selectedIds.includes(item.id) ? '☑️' : '⬜'}</Text>
               )}
