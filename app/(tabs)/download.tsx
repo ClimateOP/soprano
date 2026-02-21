@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,24 +7,14 @@ import {
   FlatList,
   Image,
   Pressable,
-  Platform,
   Modal,
 } from 'react-native';
-import * as FileSystem from 'expo-file-system/legacy';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-type SearchItem = {
-  id: string;
-  title: string;
-  uploader: string;
-  thumbnail: string;
-  url: string;
-  track: string;
-  artist: string;
-  webpage_url: string;
-};
-
-const SONG_DIR = FileSystem.documentDirectory + 'songs/';
+import {
+  SearchItem,
+  searchSong,
+  downloadSong,
+  makeDirectory,
+} from '../utils/downloadFunctions';
 
 export default function Download() {
   const [query, setQuery] = useState('');
@@ -34,59 +24,20 @@ export default function Download() {
   const [artistInput, setArtistInput] = useState('');
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const search = async () => {
-    const res = await fetch(
-      `http://192.168.100.4:3000/search?q=${encodeURIComponent(query)}`,
-    );
-    const data = await res.json();
-    setResults(data);
+  const handleSearch = async () => {
+    setResults(await searchSong(query));
   };
 
   useEffect(() => {
-    if (Platform.OS !== 'web') {
-      FileSystem.makeDirectoryAsync(SONG_DIR, { intermediates: true });
-    }
+    makeDirectory();
   }, []);
 
-  const downloadSong = async (
+  const handleDownload = async (
     item: SearchItem,
     track: string,
     artist: string,
   ) => {
-    const fileUri = SONG_DIR + item.id + '.mp3';
-    const thumbnailUri = SONG_DIR + item.id + '.jpg';
-
-    await FileSystem.downloadAsync(
-      `http://192.168.100.4:3000/download?url=${encodeURIComponent(item.webpage_url)}`,
-      fileUri,
-    );
-    await FileSystem.downloadAsync(item.thumbnail, thumbnailUri);
-
-    const stored = JSON.parse((await AsyncStorage.getItem('songs')) || '[]');
-
-    stored.push({
-      id: item.id,
-      track,
-      artist,
-      fileUri,
-      thumbnailUri,
-      playlists: [],
-    });
-
-    AsyncStorage.setItem('songs', JSON.stringify(stored));
-
-    console.log('Downloaded', fileUri);
-
-    //checking
-    console.log(FileSystem.documentDirectory);
-
-    const dir = FileSystem.documentDirectory + 'songs/';
-
-    const files = await FileSystem.readDirectoryAsync(dir);
-    console.log('Songs Folder:', files);
-
-    const info = await FileSystem.getInfoAsync(dir + files[0]);
-    console.log(info);
+    await downloadSong(item, track, artist);
   };
 
   return (
@@ -98,7 +49,7 @@ export default function Download() {
         className="border p-3 rounded"
       />
 
-      <Button title="Search" onPress={search} />
+      <Button title="Search" onPress={handleSearch} />
 
       <FlatList
         data={result}
@@ -165,7 +116,7 @@ export default function Download() {
               onPress={() => {
                 setSheetOpen(false);
                 if (selectedItem) {
-                  downloadSong(selectedItem, trackInput, artistInput);
+                  handleDownload(selectedItem, trackInput, artistInput);
                 }
               }}
             >
