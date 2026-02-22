@@ -19,6 +19,7 @@ import { SearchBar } from '@/components/ui/searchbar';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 export default function PlaylistOpen() {
   const [songs, setSongs] = useState<Song[]>([]);
@@ -28,6 +29,7 @@ export default function PlaylistOpen() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const { loadQueue } = usePlayer();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { text, muted, card } = useThemeColors();
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -104,7 +106,7 @@ export default function PlaylistOpen() {
         >
           <Icon name={ArrowLeft} />
         </Button>
-        <Text className="text-white text-2xl font-semibold">
+        <Text className="text-2xl font-semibold" style={{ color: text }}>
           {playlist?.name ?? 'Playlist'}
         </Text>
       </View>
@@ -119,8 +121,11 @@ export default function PlaylistOpen() {
           />
         </View>
         {!selectMode && (
-          <Button onPress={() => setSelectMode(true)}>
-            <Text>Select</Text>
+          <Button
+            onPress={() => setSelectMode(true)}
+            style={{ backgroundColor: muted }}
+          >
+            <Text style={{ color: card }}> Select</Text>
           </Button>
         )}
       </View>
@@ -130,9 +135,14 @@ export default function PlaylistOpen() {
           data={[...filteredSongs].reverse()}
           keyExtractor={(item) => item.id}
           ListEmptyComponent={
-            <Text className="text-white text-[15px] font-semibold">
-              No Songs in {playlist?.name ?? 'this Playlist'}
-            </Text>
+            <View className="flex-1 justify-center items-center mt-2">
+              <Text
+                className="text-[15px] font-semibold text-center"
+                style={{ color: muted }}
+              >
+                No Songs in {playlist?.name ?? 'this Playlist'}
+              </Text>
+            </View>
           }
           renderItem={({ item }) => (
             <Pressable
@@ -146,7 +156,8 @@ export default function PlaylistOpen() {
                   loadQueue(filteredSongs, index);
                 }
               }}
-              className="flex-row items-center gap-3 my-2 p-3 rounded-2xl bg-[hsl(240,3%,11%)] active:opacity-80"
+              className="flex-row items-center gap-3 my-2 p-3 rounded-2xl active:opacity-80"
+              style={{ backgroundColor: card }}
             >
               <Image
                 source={{ uri: item.thumbnailUri }}
@@ -155,11 +166,12 @@ export default function PlaylistOpen() {
               <View className="flex-1">
                 <Text
                   numberOfLines={1}
-                  className="text-white text-[15px] font-semibold"
+                  className="text-[15px] font-semibold"
+                  style={{ color: text }}
                 >
                   {item.track}
                 </Text>
-                <Text className="text-white/60 text-[13px] mt-1">
+                <Text className="text-[13px] mt-1" style={{ color: muted }}>
                   {item.artist}
                 </Text>
               </View>

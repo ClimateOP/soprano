@@ -18,6 +18,7 @@ import {
 } from '@/utils/playlistFunctions';
 import { SearchBar } from '@/components/ui/searchbar';
 import { Button } from '@/components/ui/button';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 export default function Playlists() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -26,6 +27,7 @@ export default function Playlists() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [playlistName, setPlaylistName] = useState('');
+  const { text, muted, card } = useThemeColors();
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -92,8 +94,11 @@ export default function Playlists() {
           />
         </View>
         {!selectMode && (
-          <Button onPress={() => setSelectMode(true)}>
-            <Text>Select</Text>
+          <Button
+            onPress={() => setSelectMode(true)}
+            style={{ backgroundColor: muted }}
+          >
+            <Text style={{ color: card }}>Select</Text>
           </Button>
         )}
       </View>
@@ -111,9 +116,12 @@ export default function Playlists() {
               <Pressable
                 disabled={selectMode}
                 onPress={() => setSheetOpen(true)}
-                className="bg-gray-200 p-4 rounded items-center my-2"
+                className="p-4 rounded items-center my-2"
+                style={{ backgroundColor: muted }}
               >
-                <Text className="text-x">+ Create Playlist</Text>
+                <Text className="text-x" style={{ color: card }}>
+                  + Create Playlist
+                </Text>
               </Pressable>
             );
           }
@@ -128,9 +136,13 @@ export default function Playlists() {
                       params: { id: item.id },
                     })
               }
-              className="flex-row items-center gap-3 my-2 p-6 rounded-2xl bg-[hsl(240,3%,11%)] active:opacity-80 justify-between"
+              className="flex-row items-center gap-3 my-2 p-6 rounded-2xl active:opacity-80 justify-between"
+              style={{ backgroundColor: card }}
             >
-              <Text className="text-white text-[15px] font-semibold">
+              <Text
+                className="text-[15px] font-semibold"
+                style={{ color: text }}
+              >
                 {item.name}
               </Text>
               {selectMode && (

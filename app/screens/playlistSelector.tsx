@@ -6,12 +6,15 @@ import {
   addSongsToPlaylists,
   getPlaylists,
 } from '@/utils/playlistFunctions';
+import { useThemeColors } from '@/hooks/useThemeColors';
+import { SearchBar } from '@/components/ui/searchbar';
 
 export default function PlaylistSelector() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [query, setQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const { songIds } = useLocalSearchParams<{ songIds: string }>();
+  const { text, muted, card } = useThemeColors();
 
   const parsedSongIds: string[] = JSON.parse(songIds || '[]');
 
@@ -48,11 +51,10 @@ export default function PlaylistSelector() {
   return (
     <View className="flex-1 mt-10">
       <View className="p-4">
-        <TextInput
+        <SearchBar
           placeholder="Search Playlists..."
           value={query}
           onChangeText={setQuery}
-          className="border p-3 rounded"
         />
       </View>
 
@@ -64,9 +66,15 @@ export default function PlaylistSelector() {
           renderItem={({ item }) => (
             <Pressable
               onPress={() => toggleSelect(item.id)}
-              className="flex-row justify-between bg-white p-3 my-2 rounded"
+              className="flex-row items-center gap-3 my-2 p-6 rounded-2xl active:opacity-80 justify-between"
+              style={{ backgroundColor: card }}
             >
-              <Text>{item.name}</Text>
+              <Text
+                className="text-[15px] font-semibold"
+                style={{ color: text }}
+              >
+                {item.name}
+              </Text>
               <Text>{selectedIds.includes(item.id) ? '☑️' : '⬜'}</Text>
             </Pressable>
           )}

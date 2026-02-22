@@ -12,6 +12,7 @@ import { usePlayer } from '@/context/playerContext';
 import { Song, getSongs, deleteSongs } from '@/utils/songFunctions';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/components/ui/searchbar';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 export default function Songs() {
   const [songs, setSongs] = useState<Song[]>([]);
@@ -19,6 +20,7 @@ export default function Songs() {
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const { loadQueue } = usePlayer();
+  const { text, muted, card } = useThemeColors();
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -77,8 +79,11 @@ export default function Songs() {
           />
         </View>
         {!selectMode && (
-          <Button onPress={() => setSelectMode(true)}>
-            <Text>Select</Text>
+          <Button
+            onPress={() => setSelectMode(true)}
+            style={{ backgroundColor: muted }}
+          >
+            <Text style={{ color: card }}>Select</Text>
           </Button>
         )}
       </View>
@@ -86,7 +91,16 @@ export default function Songs() {
         <FlatList
           data={[...filteredSongs].reverse()}
           keyExtractor={(item) => item.id}
-          ListEmptyComponent={<Text>No Songs Downloaded</Text>}
+          ListEmptyComponent={
+            <View className="flex-1 justify-center items-center">
+              <Text
+                className="text-[15px] font-semibold text-center"
+                style={{ color: muted }}
+              >
+                No downloaded songs
+              </Text>
+            </View>
+          }
           contentContainerClassName="p-4"
           renderItem={({ item }) => (
             <Pressable
@@ -100,7 +114,8 @@ export default function Songs() {
                   loadQueue(filteredSongs, index);
                 }
               }}
-              className="flex-row items-center gap-3 my-2 p-3 rounded-2xl bg-[hsl(240,3%,11%)] active:opacity-80"
+              className="flex-row items-center gap-3 my-2 p-3 rounded-2xl active:opacity-80"
+              style={{ backgroundColor: card }}
             >
               <Image
                 source={{ uri: item.thumbnailUri }}
@@ -110,11 +125,12 @@ export default function Songs() {
               <View className="flex-1">
                 <Text
                   numberOfLines={1}
-                  className="text-white text-[15px] font-semibold"
+                  className=" text-[15px] font-semibold"
+                  style={{ color: text }}
                 >
                   {item.track}
                 </Text>
-                <Text className="text-white/60 text-[13px] mt-1">
+                <Text className="text-[13px] mt-1" style={{ color: muted }}>
                   {item.artist}
                 </Text>
               </View>
