@@ -9,6 +9,7 @@ import {
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { SearchBar } from '@/components/ui/searchbar';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function PlaylistSelector() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -76,7 +77,10 @@ export default function PlaylistSelector() {
               >
                 {item.name}
               </Text>
-              <Text>{selectedIds.includes(item.id) ? '☑️' : '⬜'}</Text>
+              <Checkbox
+                checked={selectedIds.includes(item.id)}
+                onCheckedChange={() => toggleSelect(item.id)}
+              />
             </Pressable>
           )}
         />
@@ -87,14 +91,18 @@ export default function PlaylistSelector() {
         style={{ backgroundColor: card }}
       >
         <Button onPress={() => router.back()} size="sm">
-          <Text>Cancel</Text>
+          <Text className="font-medium" style={{ color: card }}>
+            Cancel
+          </Text>
         </Button>
         <Button
           onPress={handleAdd}
           size="sm"
           style={{ backgroundColor: 'hsl(145, 84%, 32%)' }}
         >
-          <Text>Save</Text>
+          <Text className="font-medium" style={{ color: card }}>
+            Save
+          </Text>
         </Button>
       </View>
     </View>

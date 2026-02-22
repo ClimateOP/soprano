@@ -1,14 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { router, useFocusEffect } from 'expo-router';
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  TextInput,
-  Modal,
-  BackHandler,
-} from 'react-native';
+import { View, Text, FlatList, Pressable, BackHandler } from 'react-native';
 
 import {
   Playlist,
@@ -20,15 +12,17 @@ import { SearchBar } from '@/components/ui/searchbar';
 import { Button } from '@/components/ui/button';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { Checkbox } from '@/components/ui/checkbox';
+import { BottomSheet, useBottomSheet } from '@/components/ui/bottom-sheet';
+import { Input } from '@/components/ui/input';
 
 export default function Playlists() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [query, setQuery] = useState('');
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [sheetOpen, setSheetOpen] = useState(false);
   const [playlistName, setPlaylistName] = useState('');
   const { text, muted, card } = useThemeColors();
+  const { isVisible, open, close } = useBottomSheet();
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -67,7 +61,7 @@ export default function Playlists() {
       return;
     }
     await createPlaylist(playlistName.trim());
-    setSheetOpen(false);
+    close();
     setPlaylistName('');
     loadPlaylists();
   };
@@ -99,7 +93,9 @@ export default function Playlists() {
             onPress={() => setSelectMode(true)}
             style={{ backgroundColor: muted }}
           >
-            <Text style={{ color: card }}>Select</Text>
+            <Text className="font-medium" style={{ color: card }}>
+              Select
+            </Text>
           </Button>
         )}
       </View>
@@ -116,11 +112,11 @@ export default function Playlists() {
             return (
               <Pressable
                 disabled={selectMode}
-                onPress={() => setSheetOpen(true)}
+                onPress={open}
                 className="p-4 rounded items-center my-2"
                 style={{ backgroundColor: muted }}
               >
-                <Text className="text-x" style={{ color: card }}>
+                <Text className="text-x font-medium" style={{ color: card }}>
                   + Create Playlist
                 </Text>
               </Pressable>
@@ -171,58 +167,58 @@ export default function Playlists() {
               }}
               size="sm"
             >
-              <Text>Cancel</Text>
+              <Text style={{ color: card }}>Cancel</Text>
             </Button>
             <Button
               onPress={handleDelete}
               size="sm"
               style={{ backgroundColor: 'hsl(359, 71%, 58%)' }}
             >
-              <Text>Delete</Text>
+              <Text style={{ color: card }}>Delete</Text>
             </Button>
           </View>
         </>
       )}
 
-      <Modal
-        visible={sheetOpen}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setSheetOpen(false)}
-      >
-        <Pressable
-          onPress={() => setSheetOpen(false)}
-          className="flex-1 justify-end bg-black/40"
-        >
-          <Pressable
-            onPress={(e) => e.stopPropagation()}
-            className="bg-white p-4 gap-3 rounded-t-2xl"
-          >
-            <Text>Create Playlist</Text>
-            <TextInput
-              placeholder="Playlist Name"
-              value={playlistName}
-              onChangeText={setPlaylistName}
-              className="border p-2 rounded"
-            />
-            <Pressable
+      <BottomSheet isVisible={isVisible} onClose={close} snapPoints={[0.23]}>
+        <View className="gap-5">
+          <Text className="text-xl font-bold" style={{ color: text }}>
+            Create Playlist
+          </Text>
+          <Input
+            autoFocus
+            placeholder="Enter Playlist Name"
+            value={playlistName}
+            onChangeText={setPlaylistName}
+            className="border rounded-lg mb-2"
+            inputStyle={{ fontSize: 15, borderColor: muted }}
+          />
+
+          <View className="flex-row justify-around">
+            <Button
               onPress={() => {
-                setSheetOpen(false);
+                close();
                 setPlaylistName('');
               }}
-              className="bg-gray-300 p-3 rounded"
+              size="sm"
             >
-              <Text>Cancel</Text>
-            </Pressable>
-            <Pressable
+              <Text className="font-medium" style={{ color: card }}>
+                Cancel
+              </Text>
+            </Button>
+
+            <Button
               onPress={handleCreate}
-              className="bg-blue-500 p-3 rounded"
+              style={{ backgroundColor: 'hsl(145, 84%, 32%)' }}
+              size="sm"
             >
-              <Text className="text-white text-center">Create</Text>
-            </Pressable>
-          </Pressable>
-        </Pressable>
-      </Modal>
+              <Text className="font-medium" style={{ color: card }}>
+                Create
+              </Text>
+            </Button>
+          </View>
+        </View>
+      </BottomSheet>
     </>
   );
 }

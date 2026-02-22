@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  FlatList,
-  Image,
-  Pressable,
-  Modal,
-} from 'react-native';
+import { View, Text, FlatList, Image, Pressable } from 'react-native';
 import {
   SearchItem,
   searchSong,
@@ -18,6 +10,9 @@ import { SearchBar } from '@/components/ui/searchbar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { Progress } from '@/components/ui/progress';
+import { BottomSheet, useBottomSheet } from '@/components/ui/bottom-sheet';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export default function Download() {
   const [query, setQuery] = useState('');
@@ -25,11 +20,11 @@ export default function Download() {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [trackInput, setTrackInput] = useState('');
   const [artistInput, setArtistInput] = useState('');
-  const [sheetOpen, setSheetOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [progress, setProgress] = useState(0);
   const { text, muted, card } = useThemeColors();
+  const { isVisible, open, close } = useBottomSheet();
 
   const handleSearch = async () => {
     setLoading(true);
@@ -83,7 +78,7 @@ export default function Download() {
                 setSelectedItem(item);
                 setTrackInput(item.track ?? item.title ?? '');
                 setArtistInput(item.artist ?? item.uploader ?? '');
-                setSheetOpen(true);
+                open();
               }}
               className="flex-row items-center gap-3 my-2 p-3 rounded-2xl active:opacity-80"
               style={{ backgroundColor: card }}
@@ -111,55 +106,56 @@ export default function Download() {
         />
       )}
 
-      <Modal
-        visible={sheetOpen}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setSheetOpen(false)}
-      >
-        <Pressable
-          className="flex-1 justify-end bg-black/40"
-          onPress={() => setSheetOpen(false)}
-        >
-          <Pressable
-            className="bg-white p-4 gap-3 rounded-t-2xl"
-            onPress={(e) => e.stopPropagation()}
-          >
-            <Text>Title</Text>
-            <TextInput
+      <BottomSheet isVisible={isVisible} onClose={close} snapPoints={[0.27]}>
+        <View className="gap-2">
+          <Text className="text-lg font-semibold" style={{ color: text }}>
+            Download Song
+          </Text>
+
+          <View className="flex-column">
+            <Input
+              autoFocus
+              label="Title"
+              placeholder="Enter title..."
               value={trackInput}
               onChangeText={setTrackInput}
-              className="border p-2 rounded"
+              className="border rounded-lg mb-2"
+              inputStyle={{ fontSize: 15, borderColor: muted }}
             />
-
-            <Text>Artist</Text>
-            <TextInput
+            <Input
+              label="Artist"
+              placeholder="Enter artist..."
               value={artistInput}
               onChangeText={setArtistInput}
-              className="border p-2 rounded"
+              className="border rounded-lg mb-2"
+              inputStyle={{ fontSize: 15, borderColor: muted }}
             />
+          </View>
 
-            <Pressable
-              className="bg-red-400 p-3 rounded"
-              onPress={() => setSheetOpen(false)}
-            >
-              <Text>Cancel</Text>
-            </Pressable>
-
-            <Pressable
-              className="bg-blue-500 p-3 rounded"
+          <View className="flex-row justify-around">
+            <Button onPress={close} size="sm">
+              <Text className="font-medium" style={{ color: card }}>
+                Cancel
+              </Text>
+            </Button>
+            <Button
               onPress={() => {
-                setSheetOpen(false);
+                close();
                 if (selectedItem) {
                   handleDownload(selectedItem, trackInput, artistInput);
                 }
               }}
+              style={{ backgroundColor: 'hsl(145, 84%, 32%)' }}
+              size="sm"
             >
-              <Text className="text-white text-center">Download</Text>
-            </Pressable>
-          </Pressable>
-        </Pressable>
-      </Modal>
+              <Text className="font-medium" style={{ color: card }}>
+                Download
+              </Text>
+            </Button>
+          </View>
+        </View>
+      </BottomSheet>
+
       {downloading && (
         <View className="absolute inset-0 justify-center items-center px-6 bg-black/60 ">
           <View

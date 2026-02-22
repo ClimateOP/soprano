@@ -126,7 +126,10 @@ export default function PlaylistOpen() {
             onPress={() => setSelectMode(true)}
             style={{ backgroundColor: muted }}
           >
-            <Text style={{ color: card }}> Select</Text>
+            <Text className="font-medium" style={{ color: card }}>
+              {' '}
+              Select
+            </Text>
           </Button>
         )}
       </View>
@@ -198,7 +201,9 @@ export default function PlaylistOpen() {
             }}
             size="sm"
           >
-            <Text style={{ color: card }}>Cancel</Text>
+            <Text className="font-medium" style={{ color: card }}>
+              Cancel
+            </Text>
           </Button>
           <Button
             onPress={handleRemove}
@@ -212,7 +217,9 @@ export default function PlaylistOpen() {
             size="sm"
             style={{ backgroundColor: 'hsl(359, 71%, 58%)' }}
           >
-            <Text style={{ color: card }}>Delete</Text>
+            <Text className="font-medium" style={{ color: card }}>
+              Delete
+            </Text>
           </Button>
         </View>
       )}

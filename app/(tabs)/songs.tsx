@@ -86,7 +86,9 @@ export default function Songs() {
             onPress={() => setSelectMode(true)}
             style={{ backgroundColor: muted }}
           >
-            <Text style={{ color: card }}>Select</Text>
+            <Text className="font-medium" style={{ color: card }}>
+              Select
+            </Text>
           </Button>
         )}
       </View>
@@ -161,7 +163,9 @@ export default function Songs() {
               }}
               size="sm"
             >
-              <Text style={{ color: card }}>Cancel</Text>
+              <Text className="font-medium" style={{ color: card }}>
+                Cancel
+              </Text>
             </Button>
             <Button
               onPress={() =>
@@ -180,7 +184,9 @@ export default function Songs() {
               size="sm"
               style={{ backgroundColor: 'hsl(359, 71%, 58%)' }}
             >
-              <Text style={{ color: card }}>Delete</Text>
+              <Text className="font-medium" style={{ color: card }}>
+                Delete
+              </Text>
             </Button>
           </View>
         </>
