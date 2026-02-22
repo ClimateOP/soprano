@@ -13,6 +13,9 @@ import { Song, getSongs, deleteSongs } from '@/utils/songFunctions';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/components/ui/searchbar';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Icon } from '@/components/ui/icon';
+import { Heart } from 'lucide-react-native';
 
 export default function Songs() {
   const [songs, setSongs] = useState<Song[]>([]);
@@ -135,7 +138,10 @@ export default function Songs() {
                 </Text>
               </View>
               {selectMode && (
-                <Text>{selectedIds.includes(item.id) ? '☑️' : '⬜'}</Text>
+                <Checkbox
+                  checked={selectedIds.includes(item.id)}
+                  onCheckedChange={() => toggleSelect(item.id)}
+                />
               )}
             </Pressable>
           )}
@@ -144,28 +150,38 @@ export default function Songs() {
       {selectMode && (
         <>
           <View className="absolute inset-0" pointerEvents="none" />
-          <View className="absolute bottom-0 left-0 right-0 bg-white p-4 flex-row justify-around border-t">
-            <Pressable
+          <View
+            className="absolute bottom-0 left-0 right-0 p-4 flex-row justify-around border-t"
+            style={{ backgroundColor: card }}
+          >
+            <Button
               onPress={() => {
                 setSelectMode(false);
                 setSelectedIds([]);
               }}
+              size="sm"
             >
-              <Text>Cancel</Text>
-            </Pressable>
-            <Pressable
+              <Text style={{ color: card }}>Cancel</Text>
+            </Button>
+            <Button
               onPress={() =>
                 router.push({
                   pathname: '/screens/playlistSelector',
                   params: { songIds: JSON.stringify(selectedIds) },
                 })
               }
+              variant="link"
+              className="justify-center"
             >
-              <Text>❤️</Text>
-            </Pressable>
-            <Pressable onPress={handleDelete}>
-              <Text>Delete</Text>
-            </Pressable>
+              <Icon name={Heart} />
+            </Button>
+            <Button
+              onPress={handleDelete}
+              size="sm"
+              style={{ backgroundColor: 'hsl(359, 71%, 58%)' }}
+            >
+              <Text style={{ color: card }}>Delete</Text>
+            </Button>
           </View>
         </>
       )}

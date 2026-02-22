@@ -19,6 +19,7 @@ import {
 import { SearchBar } from '@/components/ui/searchbar';
 import { Button } from '@/components/ui/button';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function Playlists() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -136,7 +137,7 @@ export default function Playlists() {
                       params: { id: item.id },
                     })
               }
-              className="flex-row items-center gap-3 my-2 p-6 rounded-2xl active:opacity-80 justify-between"
+              className="flex-row items-center gap-3 my-2 p-6 rounded-2xl active:opacity-80 justify-between h-[70px]"
               style={{ backgroundColor: card }}
             >
               <Text
@@ -146,7 +147,10 @@ export default function Playlists() {
                 {item.name}
               </Text>
               {selectMode && (
-                <Text>{selectedIds.includes(item.id) ? '☑️' : '⬜'}</Text>
+                <Checkbox
+                  checked={selectedIds.includes(item.id)}
+                  onCheckedChange={() => toggleSelect(item.id)}
+                />
               )}
             </Pressable>
           );
@@ -156,18 +160,26 @@ export default function Playlists() {
       {selectMode && (
         <>
           <View className="absolute inset-0" pointerEvents="none" />
-          <View className="absolute bottom-0 left-0 right-0 bg-white p-4 flex-row justify-around border-t">
-            <Pressable
+          <View
+            className="absolute bottom-0 left-0 right-0 p-4 flex-row justify-around border-t"
+            style={{ backgroundColor: card }}
+          >
+            <Button
               onPress={() => {
                 setSelectMode(false);
                 setSelectedIds([]);
               }}
+              size="sm"
             >
               <Text>Cancel</Text>
-            </Pressable>
-            <Pressable onPress={handleDelete}>
+            </Button>
+            <Button
+              onPress={handleDelete}
+              size="sm"
+              style={{ backgroundColor: 'hsl(359, 71%, 58%)' }}
+            >
               <Text>Delete</Text>
-            </Pressable>
+            </Button>
           </View>
         </>
       )}

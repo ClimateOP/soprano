@@ -8,6 +8,7 @@ import {
 } from '@/utils/playlistFunctions';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { SearchBar } from '@/components/ui/searchbar';
+import { Button } from '@/components/ui/button';
 
 export default function PlaylistSelector() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -81,13 +82,20 @@ export default function PlaylistSelector() {
         />
       </View>
 
-      <View className="bg-white p-4 flex-row justify-around border-t">
-        <Pressable onPress={() => router.back()}>
+      <View
+        className="p-4 flex-row justify-around border-t"
+        style={{ backgroundColor: card }}
+      >
+        <Button onPress={() => router.back()} size="sm">
           <Text>Cancel</Text>
-        </Pressable>
-        <Pressable onPress={handleAdd}>
+        </Button>
+        <Button
+          onPress={handleAdd}
+          size="sm"
+          style={{ backgroundColor: 'hsl(145, 84%, 32%)' }}
+        >
           <Text>Save</Text>
-        </Pressable>
+        </Button>
       </View>
     </View>
   );

@@ -17,9 +17,10 @@ import {
 } from '@/utils/playlistFunctions';
 import { SearchBar } from '@/components/ui/searchbar';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react-native';
+import { ArrowLeft, Heart } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function PlaylistOpen() {
   const [songs, setSongs] = useState<Song[]>([]);
@@ -176,28 +177,43 @@ export default function PlaylistOpen() {
                 </Text>
               </View>
               {selectMode && (
-                <Text>{selectedIds.includes(item.id) ? '☑️' : '⬜'}</Text>
+                <Checkbox
+                  checked={selectedIds.includes(item.id)}
+                  onCheckedChange={() => toggleSelect(item.id)}
+                />
               )}
             </Pressable>
           )}
         />
       </View>
       {selectMode && (
-        <View className="absolute bottom-0 left-0 right-0 bg-white p-4 flex-row justify-around border-t">
-          <Pressable
+        <View
+          className="absolute bottom-0 left-0 right-0 p-4 flex-row justify-around border-t"
+          style={{ backgroundColor: card }}
+        >
+          <Button
             onPress={() => {
               setSelectMode(false);
               setSelectedIds([]);
             }}
+            size="sm"
           >
-            <Text>Cancel</Text>
-          </Pressable>
-          <Pressable onPress={handleRemove}>
-            <Text>❤️</Text>
-          </Pressable>
-          <Pressable onPress={handleDelete}>
-            <Text>Delete</Text>
-          </Pressable>
+            <Text style={{ color: card }}>Cancel</Text>
+          </Button>
+          <Button
+            onPress={handleRemove}
+            variant="link"
+            className="justify-center"
+          >
+            <Icon name={Heart} />
+          </Button>
+          <Button
+            onPress={handleDelete}
+            size="sm"
+            style={{ backgroundColor: 'hsl(359, 71%, 58%)' }}
+          >
+            <Text style={{ color: card }}>Delete</Text>
+          </Button>
         </View>
       )}
     </View>
