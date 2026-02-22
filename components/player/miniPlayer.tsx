@@ -3,6 +3,21 @@ import Slider from '@react-native-community/slider';
 import { useEffect } from 'react';
 import { usePlayer } from '../../context/playerContext';
 import { router } from 'expo-router';
+import { Icon } from '../ui/icon';
+import { useThemeColors } from '@/hooks/useThemeColors';
+import {
+  SkipBack,
+  Pause,
+  Play,
+  SkipForward,
+  Heart,
+  Repeat,
+  Repeat1,
+  Shuffle,
+  ArrowDown,
+  X,
+} from 'lucide-react-native';
+import { Button } from '../ui/button';
 
 export default function MiniPlayer() {
   const {
@@ -13,12 +28,19 @@ export default function MiniPlayer() {
     cyclePlayMode,
     playPrev,
     playNext,
+    stopPlayback,
     playerMode,
     setPlayerMode,
     position,
     duration,
     playMode,
   } = usePlayer();
+  const { text, muted, card, background, border } = useThemeColors();
+  const PlayModeIcon = {
+    Repeat: Repeat,
+    Repeat1: Repeat1,
+    Shuffle: Shuffle,
+  };
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -46,48 +68,71 @@ export default function MiniPlayer() {
     return (
       <Pressable
         onPress={() => setPlayerMode('full')}
-        className="absolute bottom-28 left-2 right-2 bg-zinc-900 p-3 rounded-xl flex-row items-center gap-3"
+        className="absolute bottom-28 left-2 right-2 p-3 rounded-xl flex-row items-center gap-3"
+        style={{ backgroundColor: card }}
       >
         <Image
           source={{ uri: currentSong.thumbnailUri }}
-          style={{ width: 48, height: 48, borderRadius: 8 }}
+          className="w-[55px] h-[55px] rounded-xl"
         />
         <View className="flex-1">
-          <Text className="text-white">{currentSong.track}</Text>
-          <Text className="text-gray-400 text-xs">{currentSong.artist}</Text>
+          <Text className="text-sm" style={{ color: text }}>
+            {currentSong.track}
+          </Text>
+          <Text className="text-xs" style={{ color: muted }}>
+            {currentSong.artist}
+          </Text>
         </View>
         <View className="flex-row gap-3">
           <Pressable onPress={playPrev}>
-            <Text className="text-white">⏮</Text>
+            <Icon name={SkipBack} />
           </Pressable>
 
           <Pressable onPress={togglePauseResume}>
-            <Text className="text-white">{isPlaying ? '⏸' : '▶'}</Text>
+            <Icon name={isPlaying ? Pause : Play} />
           </Pressable>
 
           <Pressable onPress={playNext}>
-            <Text className="text-white">⏭</Text>
+            <Icon name={SkipForward} />
           </Pressable>
         </View>
       </Pressable>
     );
   } else {
     return (
-      <View className="absolute inset-0 bg-black p-6 justify-center items-center">
-        <Pressable
-          onPress={() => setPlayerMode('mini')}
-          className="absolute top-12 left-6"
-        >
-          <Text className="text-white text-lg">↓</Text>
-        </Pressable>
+      <View
+        className="absolute inset-0 p-6 justify-center items-center"
+        style={{ backgroundColor: background }}
+      >
+        <View className="absolute top-14 left-6 right-6 flex-row justify-between">
+          <Button
+            onPress={() => setPlayerMode('mini')}
+            variant="outline"
+            size="sm"
+          >
+            <Icon name={ArrowDown} />
+          </Button>
+
+          <Button onPress={stopPlayback} variant="outline" size="sm">
+            <Icon name={X} />
+          </Button>
+        </View>
 
         <Image
           source={{ uri: currentSong.thumbnailUri }}
-          style={{ width: 260, height: 260, borderRadius: 20 }}
+          className="w-[300px] h-[300px] rounded-3xl top-2"
+          style={{ borderWidth: 1, borderColor: border }}
         />
 
-        <Text className="text-white text-xl mt-6">{currentSong.track}</Text>
-        <Text className="text-gray-400">{currentSong.artist}</Text>
+        <Text
+          className="text-xl mt-6 text-center pt-4 pb-2"
+          style={{ color: text }}
+        >
+          {currentSong.track}
+        </Text>
+        <Text className="pb-3" style={{ color: muted }}>
+          {currentSong.artist}
+        </Text>
 
         <Slider
           style={{ width: '100%', height: 40 }}
@@ -102,37 +147,45 @@ export default function MiniPlayer() {
         />
 
         <View className="flex-row justify-between items-center w-full px-1">
-          <Text className="text-xs text-white">{formatTime(position)}</Text>
-          <Text className="text-xs text-white">{formatTime(duration)}</Text>
+          <Text className="text-xs" style={{ color: text }}>
+            {formatTime(position)}
+          </Text>
+          <Text className="text-xs" style={{ color: text }}>
+            {formatTime(duration)}
+          </Text>
         </View>
 
-        <View className="flex-row gap-6 mt-8 items-center">
-          <Pressable onPress={cyclePlayMode}>
-            <Text className="text-white text-xs">{playMode}</Text>
-          </Pressable>
-          <Pressable onPress={playPrev}>
-            <Text className="text-white text-xl">⏮</Text>
-          </Pressable>
+        <View
+          className="flex-row gap-8 mt-12 p-6 items-center rounded-3xl"
+          style={{ borderWidth: 1, borderColor: border }}
+        >
+          <Button onPress={cyclePlayMode} variant="link">
+            <Icon name={PlayModeIcon[playMode]} />
+          </Button>
+          <Button onPress={playPrev} variant="link">
+            <Icon name={SkipBack} />
+          </Button>
 
-          <Pressable onPress={togglePauseResume}>
-            <Text className="text-white text-xl">{isPlaying ? '⏸' : '▶'}</Text>
-          </Pressable>
+          <Button onPress={togglePauseResume} variant="link">
+            <Icon name={isPlaying ? Pause : Play} />
+          </Button>
 
-          <Pressable onPress={playNext}>
-            <Text className="text-white text-xl">⏭</Text>
-          </Pressable>
+          <Button onPress={playNext} variant="link">
+            <Icon name={SkipForward} />
+          </Button>
 
-          <Pressable
+          <Button
             onPress={() => {
-              setPlayerMode('mini');
               router.push({
                 pathname: '/screens/playlistSelector',
                 params: { songIds: JSON.stringify([currentSong.id]) },
               });
+              setPlayerMode('mini');
             }}
+            variant="link"
           >
-            <Text>❤️</Text>
-          </Pressable>
+            <Icon name={Heart} />
+          </Button>
         </View>
       </View>
     );

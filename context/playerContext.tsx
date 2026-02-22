@@ -16,7 +16,7 @@ type Song = {
 };
 
 type PlayerMode = 'mini' | 'full';
-type PlayMode = 'repeat-all' | 'repeat-one' | 'shuffle';
+type PlayMode = 'Repeat' | 'Repeat1' | 'Shuffle';
 
 type PlayerCtx = {
   sound: Audio.Sound | null;
@@ -29,6 +29,7 @@ type PlayerCtx = {
   playPrev: () => Promise<void>;
   autoPlay: () => Promise<void>;
   playNext: () => Promise<void>;
+  stopPlayback: () => Promise<void>;
   playerMode: PlayerMode;
   setPlayerMode: (m: PlayerMode) => void;
   position: number;
@@ -49,7 +50,7 @@ export const PlayerProvider = ({ children }: any) => {
   const indexRef = useRef<number>(-1);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [playMode, setPlayMode] = useState<PlayMode>('repeat-one');
+  const [playMode, setPlayMode] = useState<PlayMode>('Repeat1');
   const playModeRef = useRef(playMode);
   const [playerMode, setPlayerMode] = useState<PlayerMode>('mini');
 
@@ -119,11 +120,7 @@ export const PlayerProvider = ({ children }: any) => {
 
   const cyclePlayMode = () => {
     setPlayMode((m) =>
-      m === 'repeat-all'
-        ? 'repeat-one'
-        : m === 'repeat-one'
-          ? 'shuffle'
-          : 'repeat-all',
+      m === 'Repeat' ? 'Repeat1' : m === 'Repeat1' ? 'Shuffle' : 'Repeat',
     );
   };
 
@@ -162,8 +159,8 @@ export const PlayerProvider = ({ children }: any) => {
     const mode = playModeRef.current;
     let nextIndex = indexRef.current;
 
-    if (mode === 'repeat-one') {
-    } else if (mode === 'shuffle') {
+    if (mode === 'Repeat1') {
+    } else if (mode === 'Shuffle') {
       nextIndex = Math.floor(Math.random() * q.length);
     } else {
       nextIndex = (indexRef.current + 1) % q.length;
@@ -189,6 +186,23 @@ export const PlayerProvider = ({ children }: any) => {
     await playSong(queue[next]);
   };
 
+  const stopPlayback = async () => {
+    if (!soundRef.current) return;
+
+    await soundRef.current.stopAsync();
+    await soundRef.current.unloadAsync();
+
+    soundRef.current = null;
+    setIsPlaying(false);
+    setCurrentSong(null);
+    setPosition(0);
+    setDuration(0);
+    setCurrentIndex(-1);
+    queueRef.current = [];
+    setQueue([]);
+    setPlayerMode('mini');
+  };
+
   return (
     <PlayerContext.Provider
       value={{
@@ -202,6 +216,7 @@ export const PlayerProvider = ({ children }: any) => {
         playPrev,
         autoPlay,
         playNext,
+        stopPlayback,
         playerMode,
         setPlayerMode,
         position,
