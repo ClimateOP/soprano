@@ -10,6 +10,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { SearchBar } from '@/components/ui/searchbar';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/components/ui/toast';
 
 export default function PlaylistSelector() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -17,6 +18,7 @@ export default function PlaylistSelector() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const { songIds } = useLocalSearchParams<{ songIds: string }>();
   const { text, muted, card } = useThemeColors();
+  const { success, warning } = useToast();
 
   const parsedSongIds: string[] = JSON.parse(songIds || '[]');
 
@@ -43,10 +45,15 @@ export default function PlaylistSelector() {
   const handleAdd = async () => {
     if (selectedIds.length > 0) {
       await addSongsToPlaylists(selectedIds, parsedSongIds);
+      success(
+        'Song Saved!',
+        'The song has been added to the playlist successfully.',
+      );
+
       setSelectedIds([]);
       router.back();
     } else {
-      console.log('Select playlists first pop up');
+      warning('Select Playlists', 'Please select one or more playlists');
     }
   };
 

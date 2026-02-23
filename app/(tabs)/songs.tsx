@@ -14,6 +14,8 @@ import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/components/ui/searchbar';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AlertDialog, useAlertDialog } from '@/components/ui/alert-dialog';
+import { useToast } from '@/components/ui/toast';
 import { Icon } from '@/components/ui/icon';
 import { Heart } from 'lucide-react-native';
 
@@ -24,6 +26,8 @@ export default function Songs() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const { loadQueue } = usePlayer();
   const { text, muted, card } = useThemeColors();
+  const { isAlertVisible, openAlert, closeAlert } = useAlertDialog();
+  const { success, warning } = useToast();
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -60,14 +64,12 @@ export default function Songs() {
   };
 
   const handleDelete = async () => {
-    if (selectedIds.length > 0) {
-      await deleteSongs(selectedIds);
-      setSelectMode(false);
-      setSelectedIds([]);
-      loadSongs();
-    } else {
-      console.log('Select songs first pop up');
-    }
+    await deleteSongs(selectedIds);
+    success('Song Deleted!', 'The song has been deleted successfully.');
+
+    setSelectMode(false);
+    setSelectedIds([]);
+    loadSongs();
   };
 
   return (
@@ -168,19 +170,29 @@ export default function Songs() {
               </Text>
             </Button>
             <Button
-              onPress={() =>
-                router.push({
-                  pathname: '/screens/playlistSelector',
-                  params: { songIds: JSON.stringify(selectedIds) },
-                })
-              }
+              onPress={() => {
+                if (selectedIds.length > 0) {
+                  router.push({
+                    pathname: '/screens/playlistSelector',
+                    params: { songIds: JSON.stringify(selectedIds) },
+                  });
+                } else {
+                  warning('Select Songs', 'Please select one or more songs');
+                }
+              }}
               variant="link"
               className="justify-center"
             >
               <Icon name={Heart} />
             </Button>
             <Button
-              onPress={handleDelete}
+              onPress={() => {
+                if (selectedIds.length > 0) {
+                  openAlert();
+                } else {
+                  warning('Select Songs', 'Please select one or more songs');
+                }
+              }}
               size="sm"
               style={{ backgroundColor: 'hsl(359, 71%, 58%)' }}
             >
@@ -189,6 +201,14 @@ export default function Songs() {
               </Text>
             </Button>
           </View>
+          <AlertDialog
+            title="Delete Song"
+            description="Are you sure you want to delete the song? This action cannot be undone."
+            isVisible={isAlertVisible}
+            confirmText="Delete"
+            onClose={closeAlert}
+            onConfirm={handleDelete}
+          />
         </>
       )}
     </>

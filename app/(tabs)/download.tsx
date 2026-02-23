@@ -13,6 +13,7 @@ import { Progress } from '@/components/ui/progress';
 import { BottomSheet, useBottomSheet } from '@/components/ui/bottom-sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/toast';
 
 export default function Download() {
   const [query, setQuery] = useState('');
@@ -25,6 +26,7 @@ export default function Download() {
   const [progress, setProgress] = useState(0);
   const { text, muted, card } = useThemeColors();
   const { isVisible, open, close } = useBottomSheet();
+  const { success } = useToast();
 
   const handleSearch = async () => {
     setLoading(true);
@@ -44,6 +46,7 @@ export default function Download() {
     setDownloading(true);
     setProgress(0);
     await downloadSong(item, track, artist, setProgress);
+    success('Song Downloaded!', 'The song has been downloaded successfully.');
     setDownloading(false);
   };
 

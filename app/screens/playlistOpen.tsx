@@ -17,10 +17,12 @@ import {
 } from '@/utils/playlistFunctions';
 import { SearchBar } from '@/components/ui/searchbar';
 import { Button } from '@/components/ui/button';
+import { AlertDialog, useAlertDialog } from '@/components/ui/alert-dialog';
 import { ArrowLeft, Heart } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/components/ui/toast';
 
 export default function PlaylistOpen() {
   const [songs, setSongs] = useState<Song[]>([]);
@@ -28,9 +30,14 @@ export default function PlaylistOpen() {
   const [query, setQuery] = useState('');
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [dialogType, setDialogType] = useState<'remove' | 'delete' | null>(
+    null,
+  );
   const { loadQueue } = usePlayer();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { text, muted, card } = useThemeColors();
+  const { isAlertVisible, openAlert, closeAlert } = useAlertDialog();
+  const { success, warning } = useToast();
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -75,25 +82,25 @@ export default function PlaylistOpen() {
   };
 
   const handleRemove = async () => {
-    if (playlist && selectedIds.length > 0) {
+    if (playlist) {
       await removeSongsfromPlaylists([playlist.id], selectedIds);
+      success(
+        'Song Removed!',
+        'The song has been removed from the playlist successfully.',
+      );
+
       setSelectMode(false);
       setSelectedIds([]);
       loadData();
-    } else {
-      console.log('Select songs first pop up');
     }
   };
 
   const handleDelete = async () => {
-    if (selectedIds.length > 0) {
-      await deleteSongs(selectedIds);
-      setSelectMode(false);
-      setSelectedIds([]);
-      loadData();
-    } else {
-      console.log('Select songs first pop up');
-    }
+    await deleteSongs(selectedIds);
+    success('Song Deleted!', 'The song has been deleted successfully.');
+    setSelectMode(false);
+    setSelectedIds([]);
+    loadData();
   };
 
   return (
@@ -206,14 +213,28 @@ export default function PlaylistOpen() {
             </Text>
           </Button>
           <Button
-            onPress={handleRemove}
+            onPress={() => {
+              if (selectedIds.length > 0) {
+                setDialogType('remove');
+                openAlert();
+              } else {
+                warning('Select Songs', 'Please select one or more songs');
+              }
+            }}
             variant="link"
             className="justify-center"
           >
             <Icon name={Heart} />
           </Button>
           <Button
-            onPress={handleDelete}
+            onPress={() => {
+              if (selectedIds.length > 0) {
+                setDialogType('delete');
+                openAlert();
+              } else {
+                warning('Select Songs', 'Please select one or more songs');
+              }
+            }}
             size="sm"
             style={{ backgroundColor: 'hsl(359, 71%, 58%)' }}
           >
@@ -222,6 +243,27 @@ export default function PlaylistOpen() {
             </Text>
           </Button>
         </View>
+      )}
+      {dialogType === 'remove' && (
+        <AlertDialog
+          title="Remove Song"
+          description="Are you sure you want to remove the song from the playlist? This action cannot be undone."
+          isVisible={isAlertVisible}
+          confirmText="Remove"
+          onClose={closeAlert}
+          onConfirm={handleRemove}
+        />
+      )}
+
+      {dialogType === 'delete' && (
+        <AlertDialog
+          title="Delete Song"
+          description="Are you sure you want to delete the song? This action cannot be undone."
+          isVisible={isAlertVisible}
+          confirmText="Delete"
+          onClose={closeAlert}
+          onConfirm={handleDelete}
+        />
       )}
     </View>
   );

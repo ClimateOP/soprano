@@ -12,8 +12,10 @@ import { SearchBar } from '@/components/ui/searchbar';
 import { Button } from '@/components/ui/button';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AlertDialog, useAlertDialog } from '@/components/ui/alert-dialog';
 import { BottomSheet, useBottomSheet } from '@/components/ui/bottom-sheet';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/toast';
 
 export default function Playlists() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -23,6 +25,8 @@ export default function Playlists() {
   const [playlistName, setPlaylistName] = useState('');
   const { text, muted, card } = useThemeColors();
   const { isVisible, open, close } = useBottomSheet();
+  const { isAlertVisible, openAlert, closeAlert } = useAlertDialog();
+  const { success, warning } = useToast();
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -61,20 +65,18 @@ export default function Playlists() {
       return;
     }
     await createPlaylist(playlistName.trim());
+    success('Playlist Created!', 'The playlist has been created successfully.');
     close();
     setPlaylistName('');
     loadPlaylists();
   };
 
   const handleDelete = async () => {
-    if (selectedIds.length > 0) {
-      await deletePlaylists(selectedIds);
-      setSelectMode(false);
-      setSelectedIds([]);
-      loadPlaylists();
-    } else {
-      console.log('Select songs first pop up');
-    }
+    await deletePlaylists(selectedIds);
+    success('Playlist Deleted!', 'The playlist has been deleted successfully.');
+    setSelectMode(false);
+    setSelectedIds([]);
+    loadPlaylists();
   };
 
   return (
@@ -167,14 +169,27 @@ export default function Playlists() {
               }}
               size="sm"
             >
-              <Text style={{ color: card }}>Cancel</Text>
+              <Text className="font-medium" style={{ color: card }}>
+                Cancel
+              </Text>
             </Button>
             <Button
-              onPress={handleDelete}
+              onPress={() => {
+                if (selectedIds.length > 0) {
+                  openAlert();
+                } else {
+                  warning(
+                    'Select Playlists',
+                    'Please select one or more playlists',
+                  );
+                }
+              }}
               size="sm"
               style={{ backgroundColor: 'hsl(359, 71%, 58%)' }}
             >
-              <Text style={{ color: card }}>Delete</Text>
+              <Text className="font-medium" style={{ color: card }}>
+                Delete
+              </Text>
             </Button>
           </View>
         </>
@@ -219,6 +234,14 @@ export default function Playlists() {
           </View>
         </View>
       </BottomSheet>
+      <AlertDialog
+        title="Delete Playlist"
+        description="Are you sure you want to delete the playlist? This action cannot be undone."
+        isVisible={isAlertVisible}
+        confirmText="Delete"
+        onClose={closeAlert}
+        onConfirm={handleDelete}
+      />
     </>
   );
 }

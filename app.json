@@ -3,6 +3,7 @@
     "name": "soprano",
     "slug": "soprano",
     "version": "1.0.0",
+    "backgroundColor": "#000000",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "soprano",
@@ -16,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#000000",
         "foregroundImage": "./assets/images/icon.png",
         "backgroundImage": "",
         "monochromeImage": ""
