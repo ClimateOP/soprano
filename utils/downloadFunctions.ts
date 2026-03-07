@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
+import * as Network from 'expo-network';
 import { Platform } from 'react-native';
 
 export type SearchItem = {
@@ -22,10 +23,15 @@ export const makeDirectory = () => {
   }
 };
 
+export const getServerUrl = async () => {
+  const ip = await Network.getIpAddressAsync();
+  return `http://${ip}:3000`;
+};
+
 export const searchSong = async (query: string) => {
-  const res = await fetch(
-    `http://192.168.100.7:3000/search?q=${encodeURIComponent(query)}`,
-  );
+  const server = await getServerUrl();
+  console.log(server);
+  const res = await fetch(`${server}/search?q=${encodeURIComponent(query)}`);
   const data = await res.json();
   return data;
 };
@@ -57,8 +63,9 @@ export const downloadSong = async (
   const fileUri = SONG_DIR + item.id + '.mp3';
   const thumbnailUri = SONG_DIR + item.id + '.jpg';
 
+  const server = await getServerUrl();
   await downloadWithProgress(
-    `http://192.168.100.7:3000/download?url=${encodeURIComponent(item.webpage_url)}`,
+    `${server}/download?url=${encodeURIComponent(item.webpage_url)}`,
     fileUri,
     setProgress,
   );
