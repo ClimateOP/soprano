@@ -30,7 +30,6 @@ export const getServerUrl = async () => {
 
 export const searchSong = async (query: string) => {
   const server = await getServerUrl();
-  console.log(server);
   const res = await fetch(`${server}/search?q=${encodeURIComponent(query)}`);
   const data = await res.json();
   return data;
@@ -86,12 +85,10 @@ export const downloadSong = async (
 
   console.log('Downloaded', fileUri);
 
-  //checking
-  console.log(FileSystem.documentDirectory);
-
-  const files = await FileSystem.readDirectoryAsync(SONG_DIR);
-  console.log('Songs Folder:', files);
-
-  const info = await FileSystem.getInfoAsync(SONG_DIR + files[0]);
-  console.log(info);
+  // //checking
+  // console.log(FileSystem.documentDirectory);
+  // const files = await FileSystem.readDirectoryAsync(SONG_DIR);
+  // console.log('Songs Folder:', files);
+  // const info = await FileSystem.getInfoAsync(SONG_DIR + files[0]);
+  // console.log(info);
 };

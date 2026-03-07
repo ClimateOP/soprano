@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "soprano",
+    "name": "Soprano",
     "slug": "soprano",
     "version": "1.0.0",
     "backgroundColor": "#000000",
@@ -42,10 +42,7 @@
           "image": "./assets/images/icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
+          "backgroundColor": "#000000"
         }
       ],
       [
