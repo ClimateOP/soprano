@@ -1,50 +1,61 @@
-# Welcome to your Expo app 👋
+# 🎵 Soprano
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A music app that lets you search and download songs directly to your phone using yt-dlp.
 
-## Get started
+---
 
-1. Install dependencies
+## Requirements
 
-   ```bash
-   npm install
-   ```
+- Internet connection for downloading the songs
+- After that playback is completely offline
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## Part 1 — Server Setup (Termux)
 
-In the output, you'll find options to open the app in a
+The app requires a local server running on a phone. This is what handles searching and downloading songs.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Steps
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+1. Install **Termux** from the [Play Store](https://play.google.com/store/apps/details?id=com.termux)
+2. Open Termux and run the following command:
 
 ```bash
-npm run reset-project
+curl -s https://raw.githubusercontent.com/ClimateOP/soprano-server/main/setup.sh | bash
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+3. Wait for the setup to complete — it will install all dependencies and start the server automatically.
 
-## Learn more
+4. The server will also auto-start every time you open Termux.
 
-To learn more about developing your project with Expo, look at the following resources:
+5. You can close the Termux session anytime you want by pressing exit through notifications
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## Part 2 — App Installation (APK)
 
-Join our community of developers creating universal apps.
+1. Go to the [Releases](https://github.com/ClimateOP/soprano/releases) page
+2. Download the latest `app-release.apk`
+3. Open the downloaded file on your Android phone
+4. If prompted, enable **"Install from unknown sources"** in your Android settings
+5. Complete the installation
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+## How It Works
+
+The app and the server must be running on the **same phone**. The app automatically detects the device's IP address and connects to the local server — no manual configuration needed.
+
+---
+
+## Troubleshooting
+
+**App can't connect to server**
+
+- Make sure Termux is open and the server is running
+- Try closing and reopening Termux
+
+**"Install from unknown sources" prompt**
+
+- Click on Settings → Enable "Allow from this source"
+- Or else, Go to Settings → Security → Unknown source installations → Enable your browser
