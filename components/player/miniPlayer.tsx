@@ -5,7 +5,6 @@ import { usePlayer } from '../../context/playerContext';
 import { router } from 'expo-router';
 import { Icon } from '../ui/icon';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { Audio, InterruptionModeAndroid } from 'expo-av';
 import {
   SkipBack,
   Pause,
@@ -42,15 +41,6 @@ export default function MiniPlayer() {
     Repeat1: Repeat1,
     Shuffle: Shuffle,
   };
-
-  useEffect(() => {
-    Audio.setAudioModeAsync({
-      staysActiveInBackground: true,
-      shouldDuckAndroid: true,
-      playThroughEarpieceAndroid: false,
-      interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
-    });
-  }, []);
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {

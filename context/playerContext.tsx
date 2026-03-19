@@ -5,7 +5,7 @@ import React, {
   useContext,
   useEffect,
 } from 'react';
-import { Audio } from 'expo-av';
+import { Audio, InterruptionModeAndroid } from 'expo-av';
 
 type Song = {
   id: string;
@@ -53,6 +53,15 @@ export const PlayerProvider = ({ children }: any) => {
   const [playMode, setPlayMode] = useState<PlayMode>('Repeat1');
   const playModeRef = useRef(playMode);
   const [playerMode, setPlayerMode] = useState<PlayerMode>('mini');
+
+  useEffect(() => {
+    Audio.setAudioModeAsync({
+      staysActiveInBackground: true,
+      shouldDuckAndroid: true,
+      playThroughEarpieceAndroid: false,
+      interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+    });
+  }, []);
 
   const loadQueue = async (songs: Song[], index: number) => {
     setQueue(songs);
