@@ -26,11 +26,20 @@ export default function Download() {
   const [progress, setProgress] = useState(0);
   const { text, muted, card } = useThemeColors();
   const { isVisible, open, close } = useBottomSheet();
-  const { success } = useToast();
+  const { success, error } = useToast();
 
   const handleSearch = async () => {
     setLoading(true);
-    setResults(await searchSong(query));
+    try {
+      const data = await searchSong(query);
+      setResults(data);
+    } catch (err) {
+      error(
+        'Search Failed',
+        'Could not connect to the server, please restart Termux and try again.',
+      );
+      setResults([]);
+    }
     setLoading(false);
   };
 
@@ -45,8 +54,15 @@ export default function Download() {
   ) => {
     setDownloading(true);
     setProgress(0);
-    await downloadSong(item, track, artist, setProgress);
-    success('Song Downloaded!', 'The song has been downloaded successfully.');
+    try {
+      await downloadSong(item, track, artist, setProgress);
+      success('Song Downloaded!', 'The song has been downloaded successfully.');
+    } catch (err) {
+      error(
+        'Download Failed',
+        'Could not download the song. Please restart Termux and try again.',
+      );
+    }
     setDownloading(false);
   };
 
