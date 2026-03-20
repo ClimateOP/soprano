@@ -1,3 +1,6 @@
+import { NativeModules } from 'react-native';
+const { MusicServiceModule } = NativeModules;
+
 import React, {
   useState,
   useRef,
@@ -93,6 +96,7 @@ export const PlayerProvider = ({ children }: any) => {
       setCurrentSong(song);
       setIsPlaying(true);
       setPlayerMode('full');
+      MusicServiceModule?.start(song.track, song.artist);
 
       sound.setOnPlaybackStatusUpdate((status) => {
         if (!status.isLoaded) {
@@ -210,6 +214,7 @@ export const PlayerProvider = ({ children }: any) => {
     queueRef.current = [];
     setQueue([]);
     setPlayerMode('mini');
+    MusicServiceModule?.stop();
   };
 
   return (
